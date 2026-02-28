@@ -1,18 +1,30 @@
 from fastapi import APIRouter, HTTPException, Query
+from typing import Literal
 
 from app.utils.schemas import SearchResponse, SearchResult
-from app.search.search_engine import search
+from app.search.search_engine import search_by_mode
 
 router = APIRouter(prefix="/api", tags=["Search"])
 
 @router.get("/search", response_model=SearchResponse)
-async def search_documents(q: str = Query(..., min_length=1, description="Search query")):
+async def search_documents(
+    q: str = Query(..., min_length=1, description="Search query"),
+    mode: Literal["normal", "semantic"] = Query(
+        "semantic",
+        description="Search mode: normal (Whoosh) or semantic (Chroma + embeddings)",
+    ),
+):
     """
     Search for documents matching the query.
     Returns results with highlighted snippets and relevance scores.
     """
     try:
-        results = search(q)
+        results = search_by_mode(q, mode=mode)
+    except ValueError as e:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Search mode error: {str(e)}",
+        )
     except Exception as e:
         raise HTTPException(
             status_code=500,

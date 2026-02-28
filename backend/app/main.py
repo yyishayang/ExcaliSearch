@@ -8,6 +8,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.utils.file_utils import ensure_dirs
 from app.services.indexing_service import init_index
+from app.services.semantic_service import ensure_semantic_index_up_to_date
 from app.api.routes_documents import router as documents_router
 from app.api.routes_search import router as search_router
 from app.api.routes_metadata import router as metadata_router
@@ -41,6 +42,11 @@ async def startup():
     """Initialize storage directories and search index on startup."""
     ensure_dirs()
     init_index()
+    try:
+        ensure_semantic_index_up_to_date()
+    except Exception as exc:
+        # Keep backend available even if semantic dependencies are missing.
+        print(f"[semantic] startup warning: {exc}")
 
 
 @app.get("/api/health")

@@ -210,6 +210,26 @@
   color: var(--color-text-muted);
 }
 
+.search-bar__mode {
+  background: var(--color-bg-tertiary);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-primary);
+  border-radius: var(--radius-sm);
+  padding: 6px 10px;
+  margin-left: var(--space-sm);
+  font-size: var(--font-size-xs);
+  outline: none;
+  cursor: pointer;
+}
+
+.search-bar__mode:hover {
+  border-color: var(--color-border-hover);
+}
+
+.search-bar__mode:focus {
+  border-color: var(--color-accent);
+}
+
 .search-bar__clear {
   background: none;
   border: none;
@@ -616,6 +636,15 @@
 
   .upload-zone {
     padding: var(--space-xl) var(--space-md);
+  }
+
+  .search-bar {
+    gap: 6px;
+  }
+
+  .search-bar__mode {
+    margin-left: 0;
+    max-width: 110px;
   }
 
   .viewer {

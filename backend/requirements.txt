@@ -4,3 +4,5 @@ python-multipart
 PyMuPDF
 Whoosh
 python-docx
+chromadb
+sentence-transformers

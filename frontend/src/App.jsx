@@ -26,6 +26,7 @@ function App() {
   const [documents, setDocuments] = useState([])
   const [searchResults, setSearchResults] = useState(null)
   const [searchQuery, setSearchQuery] = useState('')
+  const [searchMode, setSearchMode] = useState('semantic')
   const [selectedDocId, setSelectedDocId] = useState(null)
   const [loading, setLoading] = useState(false)
 
@@ -52,8 +53,9 @@ function App() {
   }, [loadDocuments])
 
   // Search handler
-  const handleSearch = useCallback(async (query) => {
+  const handleSearch = useCallback(async (query, mode = 'semantic') => {
     setSearchQuery(query)
+    setSearchMode(mode)
 
     if (!query) {
       setSearchResults(null)
@@ -62,7 +64,9 @@ function App() {
 
     setLoading(true)
     try {
-      const res = await fetch(`${API_BASE}/search?q=${encodeURIComponent(query)}`)
+      const res = await fetch(
+        `${API_BASE}/search?q=${encodeURIComponent(query)}&mode=${encodeURIComponent(mode)}`
+      )
       if (res.ok) {
         const text = await res.text()
         try {
@@ -144,7 +148,9 @@ function App() {
           ) : (
             <div className="empty-state">
               <div className="empty-state__icon">🔍</div>
-              <p className="empty-state__text">No results found for "{searchQuery}"</p>
+              <p className="empty-state__text">
+                No results found for "{searchQuery}" using {searchMode} mode
+              </p>
             </div>
           )}
         </>

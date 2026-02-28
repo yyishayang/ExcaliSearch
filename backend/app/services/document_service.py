@@ -21,6 +21,10 @@ from app.utils.database import (
 from app.services.extraction_service import extract_text
 from app.services.cleaning_service import clean_text
 from app.services.indexing_service import add_to_index, delete_from_index
+from app.services.semantic_service import (
+    upsert_document_chunks,
+    delete_document_chunks,
+)
 from app.services.summary_service import generate_preview
 
 
@@ -63,8 +67,19 @@ async def process_upload(file: UploadFile) -> DocumentMetadata:
         word_count=word_count,
     )
 
-    # 6. Index in Whoosh
+    # 6. Index in Whoosh + semantic vector index
     add_to_index(doc.id, cleaned, file.filename)
+    try:
+        upsert_document_chunks(
+            doc_id=doc.id,
+            filename=stored_name,
+            original_name=file.filename,
+            file_type=file_type,
+            text=cleaned,
+        )
+    except Exception as exc:
+        # Semantic indexing should not block upload.
+        print(f"[semantic] failed to index document {doc.id}: {exc}")
 
     # 7. Persist metadata
     add_document(doc)
@@ -112,6 +127,10 @@ def remove_document(doc_id: str) -> bool:
         return False
 
     delete_from_index(doc_id)
+    try:
+        delete_document_chunks(doc_id)
+    except Exception as exc:
+        print(f"[semantic] failed to delete document {doc_id}: {exc}")
     delete_file(doc.filename)
     db_delete(doc_id)
     _text_cache.pop(doc_id, None)
