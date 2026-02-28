@@ -38,6 +38,7 @@ async def upload_document(file: UploadFile = File(...)):
         file_type=doc.file_type,
         file_size=doc.file_size,
         upload_date=doc.upload_date,
+        summary=doc.summary,
     )
 
 @router.post("/upload/batch", response_model=BatchUploadResponse)
@@ -106,6 +107,7 @@ async def list_all_documents():
             file_type=d.file_type,
             file_size=d.file_size,
             upload_date=d.upload_date,
+            summary=d.summary,
             word_count=d.word_count,
         )
         for d in docs

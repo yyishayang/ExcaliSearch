@@ -25,7 +25,7 @@ from app.services.semantic_service import (
     upsert_document_chunks,
     delete_document_chunks,
 )
-from app.services.summary_service import generate_preview
+from app.services.summary_service import generate_preview, generate_smart_summary
 
 
 # In-memory text cache: doc_id -> full text
@@ -55,6 +55,7 @@ async def process_upload(file: UploadFile) -> DocumentMetadata:
     # 5. Build metadata
     word_count = len(cleaned.split()) if cleaned else 0
     preview = generate_preview(cleaned)
+    summary = generate_smart_summary(cleaned, max_sentences=5)
 
     doc = DocumentMetadata(
         filename=stored_name,
@@ -63,6 +64,7 @@ async def process_upload(file: UploadFile) -> DocumentMetadata:
         file_size=len(file_bytes),
         hash=file_hash,
         text_preview=preview,
+        summary=summary,
         page_count=page_count,
         word_count=word_count,
     )

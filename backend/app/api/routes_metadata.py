@@ -25,6 +25,7 @@ async def get_document_detail(doc_id: str):
         file_size=doc.file_size,
         upload_date=doc.upload_date,
         text_preview=doc.text_preview,
+        summary=doc.summary,
         content=content,
         page_count=doc.page_count,
         word_count=doc.word_count,

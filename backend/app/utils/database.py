@@ -45,6 +45,16 @@ def get_document(doc_id: str) -> Optional[DocumentMetadata]:
     return DocumentMetadata(**raw)
 
 
+def update_document(doc: DocumentMetadata):
+    """Update an existing document record in the database."""
+    db = load_db()
+    if doc.id in db["documents"]:
+        db["documents"][doc.id] = doc.model_dump()
+        save_db(db)
+        return True
+    return False
+
+
 def list_documents() -> List[DocumentMetadata]:
     db = load_db()
     docs = [DocumentMetadata(**v) for v in db["documents"].values()]

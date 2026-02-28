@@ -9,6 +9,7 @@ class UploadResponse(BaseModel):
     file_type: str
     file_size: int
     upload_date: str
+    summary: str = ""
     message: str = "Document uploaded and indexed successfully"
 
 
@@ -38,6 +39,7 @@ class DocumentDetail(BaseModel):
     file_size: int
     upload_date: str
     text_preview: str
+    summary: str = ""
     content: str  # full extracted text
     page_count: Optional[int] = None
     word_count: int = 0
@@ -50,6 +52,7 @@ class DocumentListItem(BaseModel):
     file_type: str
     file_size: int
     upload_date: str
+    summary: str = ""
     word_count: int = 0
 
 

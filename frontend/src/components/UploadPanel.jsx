@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react'
-import { HiUpload, HiCloudUpload, HiCheckCircle, HiExclamationCircle, HiX, HiViewGrid, HiDocument } from 'react-icons/hi'
+import { HiUpload, HiCloudUpload, HiCheckCircle, HiExclamationCircle, HiX, HiViewGrid, HiDocument, HiLightBulb } from 'react-icons/hi'
 
 const API_BASE = '/api'
 
@@ -7,7 +7,7 @@ export default function UploadPanel({ onUploadComplete, compact = false }) {
     const [isDragging, setIsDragging] = useState(false)
     const [uploading, setUploading] = useState(false)
     const [progress, setProgress] = useState(0)
-    const [message, setMessage] = useState(null) // { type: 'success'|'error', text }
+    const [message, setMessage] = useState(null) // { type: 'success'|'error', text, doc? }
     const [batchMode, setBatchMode] = useState(false)
     const [batchFiles, setBatchFiles] = useState([]) // Array of files with status
     const [batchProgress, setBatchProgress] = useState(null) // { successful, failed, total }
@@ -208,12 +208,16 @@ export default function UploadPanel({ onUploadComplete, compact = false }) {
                 throw new Error(data.detail || `Upload failed (${res.status})`)
             }
 
-            setMessage({ type: 'success', text: `"${data.original_name}" uploaded and indexed successfully` })
+            setMessage({ 
+                type: 'success', 
+                text: `"${data.original_name}" uploaded and indexed successfully`,
+                doc: data // Include full document data with summary
+            })
 
-            // Auto-hide success message after 3 seconds
+            // Auto-hide success message after 5 seconds (more time to read summary)
             setTimeout(() => {
                 setMessage(current => current?.type === 'success' ? null : current)
-            }, 3000)
+            }, 5000)
 
             if (onUploadComplete) {
                 onUploadComplete(data)
@@ -378,14 +382,25 @@ export default function UploadPanel({ onUploadComplete, compact = false }) {
             {/* Messages */}
             {message && !batchProgress && (
                 <div className={`upload-message upload-message--${message.type}`}>
-                    <span>
-                        {message.type === 'success' ? (
-                            <HiCheckCircle size={18} />
-                        ) : (
-                            <HiExclamationCircle size={18} />
-                        )}
-                    </span>
-                    <span>{message.text}</span>
+                    <div className="upload-message__header">
+                        <span>
+                            {message.type === 'success' ? (
+                                <HiCheckCircle size={18} />
+                            ) : (
+                                <HiExclamationCircle size={18} />
+                            )}
+                        </span>
+                        <span>{message.text}</span>
+                    </div>
+                    {message.doc && message.doc.summary && (
+                        <div className="upload-message__summary">
+                            <div className="flex items-center gap-2 mb-2">
+                                <HiLightBulb className="text-yellow-500" size={16} />
+                                <span className="font-semibold">Resumen:</span>
+                            </div>
+                            <p className="text-sm opacity-90">{message.doc.summary}</p>
+                        </div>
+                    )}
                 </div>
             )}
         </div>

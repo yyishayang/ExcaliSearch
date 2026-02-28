@@ -16,6 +16,7 @@ class DocumentMetadata(BaseModel):
     upload_date: str = Field(
         default_factory=lambda: datetime.now().isoformat()
     )
-    text_preview: str = ""  
-    page_count: Optional[int] = None 
+    text_preview: str = ""  # first N characters of extracted text
+    summary: str = ""  # automatic extractive summary (5-10 sentences)
+    page_count: Optional[int] = None  # for PDFs
     word_count: int = 0
