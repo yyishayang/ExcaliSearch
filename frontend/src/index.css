@@ -60,6 +60,8 @@
   --transition-fast: 0.15s ease;
   --transition-base: 0.25s ease;
   --transition-slow: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+
+  --calendar-color-scheme: dark;
 }
 
 /* Cyber Neon Theme */
@@ -108,6 +110,8 @@
   --color-accent-hover: #4f46e5;
   --color-accent-glow: rgba(99, 102, 241, 0.15);
   --color-accent-soft: rgba(99, 102, 241, 0.05);
+
+  --calendar-color-scheme: light;
 }
 
 /* Forest Dark Theme */
