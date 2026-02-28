@@ -1,8 +1,9 @@
 import { useState, useRef } from 'react'
+import { HiUpload, HiCloudUpload, HiCheckCircle, HiExclamationCircle } from 'react-icons/hi'
 
 const API_BASE = '/api'
 
-export default function UploadPanel({ onUploadComplete }) {
+export default function UploadPanel({ onUploadComplete, compact = false }) {
     const [isDragging, setIsDragging] = useState(false)
     const [uploading, setUploading] = useState(false)
     const [progress, setProgress] = useState(0)
@@ -35,7 +36,7 @@ export default function UploadPanel({ onUploadComplete }) {
     }
 
     const uploadFile = async (file) => {
-        const allowed = ['pdf', 'txt', 'docx', 'xlsx', 'csv']
+        const allowed = ['pdf', 'txt', 'docx']
         const ext = file.name.split('.').pop().toLowerCase()
         if (!allowed.includes(ext)) {
             setMessage({ type: 'error', text: `File type .${ext} not supported. Use: PDF, TXT, DOCX` })
@@ -82,6 +83,11 @@ export default function UploadPanel({ onUploadComplete }) {
 
             setMessage({ type: 'success', text: `"${data.original_name}" uploaded and indexed successfully` })
 
+            // Auto-hide success message after 3 seconds
+            setTimeout(() => {
+                setMessage(current => current?.type === 'success' ? null : current)
+            }, 3000)
+
             if (onUploadComplete) {
                 onUploadComplete(data)
             }
@@ -97,25 +103,41 @@ export default function UploadPanel({ onUploadComplete }) {
     }
 
     return (
-        <div className="upload-panel">
+        <div className={`upload-panel ${compact ? 'upload-panel--compact' : ''}`}>
             <div
                 className={`upload-zone ${isDragging ? 'upload-zone--active' : ''}`}
                 onDragOver={handleDragOver}
                 onDragLeave={handleDragLeave}
                 onDrop={handleDrop}
                 onClick={() => fileInputRef.current?.click()}
+                title="Sube un documento nuevo"
             >
-                <div className="upload-zone__icon">📄</div>
-                <div className="upload-zone__text">
-                    Drag & drop a file here or <strong>click to browse</strong>
+                <div className="upload-zone__icon">
+                    {compact ? (
+                        <HiUpload size={24} className="mx-auto" />
+                    ) : (
+                        <HiCloudUpload size={48} className="mx-auto opacity-70" />
+                    )}
                 </div>
-                <div className="upload-zone__formats">
-                    Supported formats: PDF, TXT, DOCX, XLSX, CSV
-                </div>
+                {!compact && (
+                    <>
+                        <div className="upload-zone__text">
+                            Drag & drop a file here or <strong>click to browse</strong>
+                        </div>
+                        <div className="upload-zone__formats">
+                            Supported formats: PDF, TXT, DOCX
+                        </div>
+                    </>
+                )}
+                {compact && (
+                    <div className="upload-zone__text">
+                        <strong>Subir archivo</strong>
+                    </div>
+                )}
                 <input
                     ref={fileInputRef}
                     type="file"
-                    accept=".pdf,.txt,.docx,.xlsx,.csv"
+                    accept=".pdf,.txt,.docx"
                     onChange={handleFileSelect}
                 />
             </div>
@@ -135,7 +157,13 @@ export default function UploadPanel({ onUploadComplete }) {
 
             {message && (
                 <div className={`upload-message upload-message--${message.type}`}>
-                    <span>{message.type === 'success' ? '✅' : '❌'}</span>
+                    <span>
+                        {message.type === 'success' ? (
+                            <HiCheckCircle size={18} />
+                        ) : (
+                            <HiExclamationCircle size={18} />
+                        )}
+                    </span>
                     <span>{message.text}</span>
                 </div>
             )}
