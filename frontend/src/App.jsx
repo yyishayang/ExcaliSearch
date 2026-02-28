@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { HiShieldCheck, HiOutlineFolderOpen, HiSearch, HiOutlineDocumentSearch, HiInbox } from 'react-icons/hi'
-import { FaFilePdf, FaFileWord, FaFileAlt } from 'react-icons/fa'
+import { FaFilePdf, FaFileWord, FaFileAlt, FaFileExcel, FaFileCsv } from 'react-icons/fa'
 import './App.css'
 import UploadPanel from './components/UploadPanel'
 import SearchBar from './components/SearchBar'
@@ -121,7 +121,9 @@ function App() {
   const typeIcons = {
     pdf: <FaFilePdf className="text-red-500" />,
     txt: <FaFileAlt className="text-green-500" />,
-    docx: <FaFileWord className="text-blue-500" />
+    docx: <FaFileWord className="text-blue-500" />,
+    xlsx: <FaFileExcel className="text-emerald-500" />,
+    csv: <FaFileCsv className="text-emerald-600" />
   }
 
   // Filter & Sort helper
@@ -176,6 +178,8 @@ function App() {
             <option value="pdf">PDF</option>
             <option value="txt">Texto</option>
             <option value="docx">Word</option>
+            <option value="xlsx">Excel</option>
+            <option value="csv">CSV</option>
           </select>
         </div>
         <div className="filters-bar__group">
