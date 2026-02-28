@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
-import { HiShieldCheck, HiOutlineFolderOpen, HiSearch, HiOutlineDocumentSearch, HiInbox } from 'react-icons/hi'
+import { HiShieldCheck, HiOutlineFolderOpen, HiOutlineDocumentSearch, HiInbox, HiTrash } from 'react-icons/hi'
 import { FaFilePdf, FaFileWord, FaFileAlt, FaFileExcel, FaFileCsv } from 'react-icons/fa'
 import './App.css'
 import UploadPanel from './components/UploadPanel'
@@ -247,6 +247,16 @@ function App() {
                     className="doc-card"
                     onClick={() => setSelectedDocId(doc.id)}
                   >
+                    <button
+                      className="doc-card__delete"
+                      title="Eliminar documento"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDelete(doc.id);
+                      }}
+                    >
+                      <HiTrash size={16} />
+                    </button>
                     <div className="doc-card__icon text-5xl mb-2">{typeIcons[doc.file_type] || <FaFileAlt />}</div>
                     <div className="doc-card__name" title={doc.original_name}>{doc.original_name}</div>
                     <div className="doc-card__meta">

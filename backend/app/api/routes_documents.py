@@ -11,10 +11,6 @@ router = APIRouter(prefix="/api/documents", tags=["Documents"])
 
 @router.post("/upload", response_model=UploadResponse)
 async def upload_document(file: UploadFile = File(...)):
-    """
-    Upload a document (PDF, TXT, DOCX, CSV, XLSX).
-    Extracts text, indexes it, and stores metadata.
-    """
     if not file.filename:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -44,16 +40,8 @@ async def upload_document(file: UploadFile = File(...)):
         upload_date=doc.upload_date,
     )
 
-
 @router.post("/upload/batch", response_model=BatchUploadResponse)
 async def upload_multiple_documents(files: List[UploadFile] = File(...)):
-    """
-    Upload multiple documents at once.
-    Processes each file and returns detailed results for each upload.
-    
-    Returns:
-        BatchUploadResponse with statistics and individual file results
-    """
     if not files:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -65,7 +53,6 @@ async def upload_multiple_documents(files: List[UploadFile] = File(...)):
     failed = 0
     
     for file in files:
-        # Skip files without name
         if not file.filename:
             results.append(BatchUploadResult(
                 filename="<unknown>",
@@ -75,7 +62,6 @@ async def upload_multiple_documents(files: List[UploadFile] = File(...)):
             failed += 1
             continue
         
-        # Check file type
         if not is_allowed_file(file.filename):
             results.append(BatchUploadResult(
                 filename=file.filename,
@@ -85,7 +71,6 @@ async def upload_multiple_documents(files: List[UploadFile] = File(...)):
             failed += 1
             continue
         
-        # Process file
         try:
             doc = await process_upload(file)
             results.append(BatchUploadResult(
@@ -113,7 +98,6 @@ async def upload_multiple_documents(files: List[UploadFile] = File(...)):
 
 @router.get("", response_model=list[DocumentListItem])
 async def list_all_documents():
-    """List all uploaded documents."""
     docs = list_documents()
     return [
         DocumentListItem(
@@ -130,7 +114,6 @@ async def list_all_documents():
 
 @router.get("/{doc_id}/download")
 async def download_document(doc_id: str, inline: bool = False):
-    """Download or view the original document file."""
     doc = get_document(doc_id)
     if doc is None:
         raise HTTPException(
@@ -145,7 +128,6 @@ async def download_document(doc_id: str, inline: bool = False):
             detail="File not found on disk",
         )
 
-    # Set media type based on file type
     media_types = {
         "pdf": "application/pdf",
         "txt": "text/plain",
@@ -155,7 +137,6 @@ async def download_document(doc_id: str, inline: bool = False):
     }
     media_type = media_types.get(doc.file_type, "application/octet-stream")
 
-    # Determine Content-Disposition based on inline parameter
     disposition = "inline" if inline else "attachment"
     headers = {
         "Content-Disposition": f'{disposition}; filename="{doc.original_name}"'
@@ -171,7 +152,6 @@ async def download_document(doc_id: str, inline: bool = False):
 
 @router.delete("/{doc_id}")
 async def delete_document(doc_id: str):
-    """Delete a document and its index entry."""
     success = remove_document(doc_id)
     if not success:
         raise HTTPException(

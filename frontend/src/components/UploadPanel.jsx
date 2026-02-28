@@ -60,16 +60,16 @@ export default function UploadPanel({ onUploadComplete, compact = false }) {
         }
 
         if (validFiles.length < files.length) {
-            setMessage({ 
-                type: 'warning', 
-                text: `${files.length - validFiles.length} file(s) skipped (invalid format)` 
+            setMessage({
+                type: 'warning',
+                text: `${files.length - validFiles.length} file(s) skipped (invalid format)`
             })
         }
 
-        setBatchFiles(validFiles.map(f => ({ 
-            file: f, 
-            status: 'pending', 
-            name: f.name 
+        setBatchFiles(validFiles.map(f => ({
+            file: f,
+            status: 'pending',
+            name: f.name
         })))
         uploadBatch(validFiles)
     }
@@ -132,9 +132,9 @@ export default function UploadPanel({ onUploadComplete, compact = false }) {
                 total: data.total_files
             })
 
-            setMessage({ 
-                type: data.failed === 0 ? 'success' : 'warning', 
-                text: `Batch upload complete: ${data.successful} successful, ${data.failed} failed` 
+            setMessage({
+                type: data.failed === 0 ? 'success' : 'warning',
+                text: `Batch upload complete: ${data.successful} successful, ${data.failed} failed`
             })
 
             if (onUploadComplete && data.successful > 0) {
@@ -294,7 +294,6 @@ export default function UploadPanel({ onUploadComplete, compact = false }) {
                 />
             </div>
 
-            {/* Batch files preview */}
             {batchFiles.length > 0 && !uploading && (
                 <div className="batch-files-list">
                     <div className="batch-files-header">
@@ -307,7 +306,7 @@ export default function UploadPanel({ onUploadComplete, compact = false }) {
                         {batchFiles.map((item, idx) => (
                             <div key={idx} className="batch-file-item">
                                 <span className="batch-file-name">{item.name}</span>
-                                <button 
+                                <button
                                     className="btn-remove"
                                     onClick={(e) => {
                                         e.stopPropagation()

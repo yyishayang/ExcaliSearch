@@ -1,13 +1,7 @@
-"""
-API response and request schemas.
-"""
-
 from pydantic import BaseModel
 from typing import List, Optional
 
-
 class UploadResponse(BaseModel):
-    """Response after a successful document upload."""
 
     id: str
     filename: str
@@ -19,7 +13,6 @@ class UploadResponse(BaseModel):
 
 
 class SearchResult(BaseModel):
-    """A single search result."""
 
     doc_id: str
     filename: str
@@ -30,7 +23,6 @@ class SearchResult(BaseModel):
 
 
 class SearchResponse(BaseModel):
-    """Response for a search query."""
 
     query: str
     total_results: int
@@ -38,7 +30,6 @@ class SearchResponse(BaseModel):
 
 
 class DocumentDetail(BaseModel):
-    """Full document detail for the viewer."""
 
     id: str
     filename: str
@@ -53,7 +44,6 @@ class DocumentDetail(BaseModel):
 
 
 class DocumentListItem(BaseModel):
-    """Document item for listing."""
 
     id: str
     original_name: str
@@ -64,13 +54,11 @@ class DocumentListItem(BaseModel):
 
 
 class ErrorResponse(BaseModel):
-    """Standard error response."""
 
     detail: str
 
 
 class BatchUploadResult(BaseModel):
-    """Result for a single file in batch upload."""
     
     filename: str
     status: str  # "success" or "error"
@@ -80,7 +68,6 @@ class BatchUploadResult(BaseModel):
 
 
 class BatchUploadResponse(BaseModel):
-    """Response for batch upload operation."""
     
     total_files: int
     successful: int

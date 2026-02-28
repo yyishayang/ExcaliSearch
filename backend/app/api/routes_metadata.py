@@ -8,10 +8,6 @@ router = APIRouter(prefix="/api/documents", tags=["Metadata"])
 
 @router.get("/{doc_id}", response_model=DocumentDetail)
 async def get_document_detail(doc_id: str):
-    """
-    Get full document details including extracted text content.
-    Used by the document viewer.
-    """
     doc = get_document(doc_id)
     if doc is None:
         raise HTTPException(
@@ -19,7 +15,6 @@ async def get_document_detail(doc_id: str):
             detail="Document not found",
         )
 
-    # Get full text content
     content = get_document_text(doc_id) or ""
 
     return DocumentDetail(

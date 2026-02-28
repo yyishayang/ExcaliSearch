@@ -1,14 +1,3 @@
-"""
-Cliente para carga masiva de documentos usando el API REST de ExcaliSearch.
-Envía múltiples archivos al endpoint /api/documents/upload/batch
-
-Uso:
-    python batch_upload_api.py <carpeta_documentos>
-    python batch_upload_api.py <carpeta_documentos> --url http://localhost:8000
-    python batch_upload_api.py <carpeta_documentos> --recursive
-    python batch_upload_api.py <carpeta_documentos> --batch-size 10
-"""
-
 import argparse
 import sys
 from pathlib import Path
@@ -21,17 +10,7 @@ def find_documents(
     recursive: bool = False,
     extensions: List[str] = None
 ) -> List[Path]:
-    """
-    Encuentra todos los documentos válidos en un directorio.
-    
-    Args:
-        directory: Carpeta a escanear
-        recursive: Si True, busca en subcarpetas
-        extensions: Lista de extensiones permitidas (ej: ['pdf', 'txt'])
-    
-    Returns:
-        Lista de rutas de archivos encontrados
-    """
+
     if not directory.exists():
         raise FileNotFoundError(f"El directorio no existe: {directory}")
     
@@ -60,22 +39,10 @@ def upload_batch(
     batch_number: int = None,
     total_batches: int = None
 ) -> dict:
-    """
-    Envía un lote de archivos al servidor.
-    
-    Args:
-        files: Lista de rutas de archivos a subir
-        api_url: URL del endpoint de batch upload
-        batch_number: Número del lote actual (para mostrar progreso)
-        total_batches: Total de lotes (para mostrar progreso)
-    
-    Returns:
-        Respuesta JSON del servidor
-    """
+
     batch_info = f" (Lote {batch_number}/{total_batches})" if batch_number else ""
     print(f"\n📤 Enviando {len(files)} archivo(s){batch_info}...")
     
-    # Preparar archivos para multipart/form-data
     files_data = []
     for file_path in files:
         try:
@@ -117,31 +84,13 @@ def batch_upload_via_api(
     extensions: List[str] = None,
     batch_size: int = 5
 ):
-    """
-    Procesa una carpeta completa enviando los archivos al API.
-    
-    Args:
-        directory: Carpeta con los documentos
-        api_base_url: URL base del API (ej: http://localhost:8000)
-        recursive: Procesar subcarpetas
-        extensions: Extensiones permitidas
-        batch_size: Número de archivos a enviar por request
-    """
+
     api_url = f"{api_base_url}/api/documents/upload/batch"
-    
-    # Encontrar documentos
-    print(f"📂 Escaneando directorio: {directory}")
     documents = find_documents(directory, recursive, extensions)
     
     if not documents:
-        print("❌ No se encontraron documentos que procesar")
         return
     
-    print(f"📄 Encontrados {len(documents)} documentos")
-    print(f"🌐 URL del API: {api_url}")
-    print(f"📦 Tamaño de lote: {batch_size} archivo(s) por request\n")
-    
-    # Procesar en lotes
     total_successful = 0
     total_failed = 0
     all_errors = []
@@ -155,11 +104,9 @@ def batch_upload_via_api(
         result = upload_batch(batch, api_url, batch_num, num_batches)
         
         if "error" in result:
-            print(f"❌ Error en lote: {result['error']}")
             total_failed += len(batch)
             continue
         
-        # Procesar respuesta
         successful = result.get("successful", 0)
         failed = result.get("failed", 0)
         results = result.get("results", [])
@@ -167,32 +114,17 @@ def batch_upload_via_api(
         total_successful += successful
         total_failed += failed
         
-        # Mostrar detalles del lote
-        print(f"  ✅ Exitosos: {successful}")
         if failed > 0:
-            print(f"  ❌ Fallidos: {failed}")
             for res in results:
                 if res.get("status") == "error":
                     error_info = f"{res['filename']}: {res.get('error', 'Unknown error')}"
-                    print(f"     • {error_info}")
                     all_errors.append(error_info)
     
-    # Resumen final
-    print("\n" + "="*60)
-    print("📊 RESUMEN DE CARGA MASIVA")
-    print("="*60)
-    print(f"\n✅ Exitosos: {total_successful}/{len(documents)}")
-    print(f"❌ Fallidos: {total_failed}/{len(documents)}")
-    
     if all_errors:
-        print(f"\n⚠️  ERRORES ({len(all_errors)}):")
-        for error in all_errors[:10]:  # Mostrar solo los primeros 10
+        for error in all_errors[:10]:
             print(f"  • {error}")
         if len(all_errors) > 10:
             print(f"  ... y {len(all_errors) - 10} errores más")
-    
-    print("\n✅ Proceso completado")
-
 
 def main():
     parser = argparse.ArgumentParser(
@@ -260,10 +192,8 @@ Ejemplos de uso:
             batch_size=args.batch_size
         )
     except KeyboardInterrupt:
-        print("\n\n⚠️  Proceso interrumpido por el usuario")
         sys.exit(1)
     except Exception as e:
-        print(f"\n❌ Error fatal: {e}")
         sys.exit(1)
 
 

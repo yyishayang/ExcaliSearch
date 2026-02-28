@@ -1,13 +1,3 @@
-"""
-Script de carga masiva de documentos para ExcaliSearch.
-Procesa una carpeta completa de documentos y los indexa automáticamente.
-
-Uso:
-    python batch_upload.py <carpeta_documentos>
-    python batch_upload.py <carpeta_documentos> --recursive
-    python batch_upload.py <carpeta_documentos> --extensions pdf,txt,docx
-"""
-
 import asyncio
 import sys
 from pathlib import Path

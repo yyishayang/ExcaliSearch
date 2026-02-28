@@ -1,8 +1,3 @@
-"""
-ExcaliSearch — FastAPI application entry point.
-Document search engine with upload, indexing, and full-text search.
-"""
-
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -15,14 +10,12 @@ from app.api.routes_search import router as search_router
 from app.api.routes_metadata import router as metadata_router
 from app.api.routes_semantic import router as semantic_router
 
-# Create FastAPI app
 app = FastAPI(
     title="ExcaliSearch",
     description="Document search platform — upload, index, and search documents",
     version="1.0.0",
 )
 
-# CORS middleware (allow all origins for development)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -31,14 +24,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Register routers — documents router must come BEFORE metadata router
-# so that /api/documents/upload (fixed path) is matched before
-# /api/documents/{doc_id} (variable path)
 app.include_router(search_router)
 app.include_router(documents_router)
 app.include_router(metadata_router)
 app.include_router(semantic_router)
-
 
 @app.on_event("startup")
 async def startup():

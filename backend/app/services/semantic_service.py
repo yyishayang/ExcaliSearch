@@ -1,7 +1,3 @@
-"""
-Semantic search service powered by ChromaDB + sentence-transformers.
-"""
-
 from __future__ import annotations
 
 import os
@@ -156,10 +152,8 @@ def vector_distance_to_score(distance: float) -> float:
 
 def _enhance_query(query: str) -> str:
     """Mejora la consulta para búsqueda semántica."""
-    # Normalización básica
     query = query.strip()
     
-    # Para modelos E5, agregar prefijo de consulta mejora resultados
     if "e5" in EMBEDDING_MODEL_NAME.lower():
         if not query.lower().startswith(("query:", "search:", "find:")):
             query = f"query: {query}"
@@ -216,7 +210,6 @@ def ensure_semantic_index_up_to_date():
     if not docs_to_index:
         return  # Todo está sincronizado
 
-    print(f"[semantic] {len(docs_to_index)} documento(s) no indexados en ChromaDB. Re-indexando...")
     for doc in docs_to_index:
         file_path = get_file_path(doc.filename)
         if not file_path.exists():
@@ -231,7 +224,6 @@ def ensure_semantic_index_up_to_date():
                 file_type=doc.file_type,
                 text=cleaned,
             )
-            print(f"[semantic] indexado: {doc.original_name}")
         except Exception as exc:
             print(f"[semantic] error indexando {doc.id}: {exc}")
 
@@ -284,19 +276,13 @@ def delete_document_chunks(doc_id: str):
     collection.delete(where={"doc_id": doc_id})
 
 
-# Score mínimo de similitud semántica para que un documento se incluya en los resultados.
-# Valores típicos: 0.30-0.45 (0.35 es un buen balance entre precisión y cobertura)
 MIN_SCORE_THRESHOLD = 0.35
-
-# Número de candidatos a recuperar antes del reranking (si está habilitado)
-CANDIDATES_FOR_RERANKING = 50
-
+CANDIDATES_FOR_RERANKING = 15
 
 
 def semantic_search(
     query: str, 
     limit: int = 20, 
-    verbose: bool = False,
     use_reranking: bool = True,
     file_type_filter: str | None = None
 ) -> list[dict[str, Any]]:
@@ -307,26 +293,19 @@ def semantic_search(
     Args:
         query: Consulta de búsqueda
         limit: Número máximo de resultados
-        verbose: Mostrar información de debug
         use_reranking: Aplicar reranking con Cross-Encoder (mejora precisión)
         file_type_filter: Filtrar por tipo de archivo (pdf, txt, csv, etc.)
     """
     if not query.strip():
         return []
 
-    # Mejorar la query para modelos específicos
     enhanced_query = _enhance_query(query)
-    if verbose and enhanced_query != query:
-        print(f"[semantic_search] Query mejorada: '{enhanced_query}'")
-
     collection = init_semantic_index()
 
     total_chunks = collection.count()
     if total_chunks == 0:
-        print("[semantic_search] ChromaDB está vacío, no hay documentos indexados")
         return []
 
-    # Si usamos reranking, recuperamos más candidatos iniciales
     n_candidates = CANDIDATES_FOR_RERANKING if use_reranking else limit * 10
     n_results = min(n_candidates, total_chunks)
 
@@ -340,10 +319,6 @@ def semantic_search(
     documents = raw.get("documents", [[]])[0]
     metadatas = raw.get("metadatas", [[]])[0]
     distances = raw.get("distances", [[]])[0]
-
-    if verbose:
-        print(f"[semantic_search] Query: '{query}'")
-        print(f"[semantic_search] ChromaDB devolvió {len(documents)} chunks")
 
     best_by_doc: dict[str, dict[str, Any]] = {}
     filtered_count = 0
@@ -393,9 +368,6 @@ def semantic_search(
     if use_reranking and candidates:
         reranker = _get_reranker_model()
         if reranker:
-            if verbose:
-                print(f"[semantic_search] Aplicando reranking a {len(candidates)} candidatos...")
-            
             # Preparar pares (query, chunk) para el reranker
             pairs = [[query, c["chunk_text"]] for c in candidates]
             
@@ -413,11 +385,8 @@ def semantic_search(
                         0.4 * candidate["score"] + 0.6 * normalized_score, 4
                     )
                 
-                if verbose:
-                    print(f"[semantic_search] Reranking completado")
             except Exception as exc:
-                if verbose:
-                    print(f"[semantic_search] Error en reranking: {exc}")
+                print(f"[semantic_search] Error en reranking: {exc}")
     
     # Agrupar por documento y quedarnos con el mejor chunk
     for candidate in candidates:
@@ -432,10 +401,5 @@ def semantic_search(
 
     # Ordenamos de mayor a menor score total y cortamos al límite real
     final_results = sorted(best_by_doc.values(), key=lambda c: c["score"], reverse=True)
-    
-    if verbose:
-        print(f"[semantic_search] Chunks filtrados por threshold < {MIN_SCORE_THRESHOLD}: {filtered_count}")
-        print(f"[semantic_search] Documentos con score >= threshold: {len(best_by_doc)}")
-        print(f"[semantic_search] Devolviendo top {min(len(final_results), limit)} resultados")
     
     return final_results[:limit]

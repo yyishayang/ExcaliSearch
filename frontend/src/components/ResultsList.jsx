@@ -15,7 +15,6 @@ const API_BASE = '/api'
 function formatSnippet(snippet, query) {
     if (!snippet || !query) return snippet || ''
 
-    // Stopwords comunes en español e inglés (preposiciones, artículos, conectores)
     const stopwords = new Set([
         // Español
         'el', 'la', 'los', 'las', 'un', 'una', 'unos', 'unas',

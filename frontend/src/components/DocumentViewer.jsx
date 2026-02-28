@@ -6,9 +6,6 @@ import { HiDatabase, HiPencilAlt, HiDocumentText, HiClock, HiDownload, HiX, HiTa
 
 const API_BASE = '/api'
 
-/**
- * Highlight query terms within document text.
- */
 function highlightText(text, query) {
     if (!text || !query) return text || ''
 
@@ -124,7 +121,6 @@ export default function DocumentViewer({ docId, query, onClose }) {
         fetchDoc()
     }, [docId])
 
-    // Close on Escape key
     useEffect(() => {
         const handleKey = (e) => {
             if (e.key === 'Escape') onClose()

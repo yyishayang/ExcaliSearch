@@ -14,10 +14,6 @@ async def search_documents(
         description="Search mode: normal (Whoosh), semantic (Chroma + embeddings), or hybrid (both combined)",
     ),
 ):
-    """
-    Search for documents matching the query.
-    Returns results with highlighted snippets and relevance scores.
-    """
     try:
         results = search_by_mode(q, mode=mode)
     except ValueError as e:
