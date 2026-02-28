@@ -13,7 +13,7 @@ STORAGE_DIR = BASE_DIR / "storage"
 DATA_DIR = BASE_DIR / "data"
 INDEX_DIR = BASE_DIR / "whoosh_index"
 
-ALLOWED_EXTENSIONS = {"pdf", "txt", "docx"}
+ALLOWED_EXTENSIONS = {"pdf", "txt", "docx", "xlsx", "csv"}
 
 
 def ensure_dirs():

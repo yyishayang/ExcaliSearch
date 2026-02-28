@@ -19,6 +19,10 @@ def extract_text(file_path: Path, file_type: str) -> tuple[str, int | None]:
         return _extract_txt(file_path)
     elif file_type == "docx":
         return _extract_docx(file_path)
+    elif file_type == "xlsx":
+        return _extract_xlsx(file_path)
+    elif file_type == "csv":
+        return _extract_csv(file_path)
     else:
         raise ValueError(f"Unsupported file type: {file_type}")
 
@@ -57,3 +61,35 @@ def _extract_docx(file_path: Path) -> tuple[str, None]:
     doc = Document(str(file_path))
     paragraphs = [p.text for p in doc.paragraphs if p.text.strip()]
     return "\n".join(paragraphs), None
+
+
+def _extract_xlsx(file_path: Path) -> tuple[str, None]:
+    """Extract text from XLSX using openpyxl. Reads all sheets."""
+    import openpyxl
+
+    wb = openpyxl.load_workbook(str(file_path), read_only=True, data_only=True)
+    lines = []
+    for sheet in wb.worksheets:
+        lines.append(f"[Sheet: {sheet.title}]")
+        for row in sheet.iter_rows(values_only=True):
+            cells = [str(c) if c is not None else "" for c in row]
+            if any(c.strip() for c in cells):
+                lines.append("\t".join(cells))
+    wb.close()
+    return "\n".join(lines), None
+
+
+def _extract_csv(file_path: Path) -> tuple[str, None]:
+    import csv
+
+    for encoding in ["utf-8", "latin-1", "cp1252"]:
+        try:
+            with open(file_path, newline="", encoding=encoding) as f:
+                reader = csv.reader(f)
+                lines = ["\t".join(row) for row in reader if any(cell.strip() for cell in row)]
+            return "\n".join(lines), None
+        except (UnicodeDecodeError, ValueError):
+            continue
+
+    raw = file_path.read_bytes().decode("utf-8", errors="ignore")
+    return raw, None
