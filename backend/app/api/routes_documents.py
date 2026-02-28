@@ -62,7 +62,7 @@ async def list_all_documents():
 
 
 @router.get("/{doc_id}/download")
-async def download_document(doc_id: str):
+async def download_document(doc_id: str, inline: bool = False):
     """Download or view the original document file."""
     doc = get_document(doc_id)
     if doc is None:
@@ -86,10 +86,17 @@ async def download_document(doc_id: str):
     }
     media_type = media_types.get(doc.file_type, "application/octet-stream")
 
+    # Determine Content-Disposition based on inline parameter
+    disposition = "inline" if inline else "attachment"
+    headers = {
+        "Content-Disposition": f'{disposition}; filename="{doc.original_name}"'
+    }
+
     return FileResponse(
         path=str(file_path),
         filename=doc.original_name,
         media_type=media_type,
+        headers=headers,
     )
 
 
