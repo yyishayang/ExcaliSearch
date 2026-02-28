@@ -11,7 +11,7 @@ router = APIRouter(prefix="/api/documents", tags=["Documents"])
 @router.post("/upload", response_model=UploadResponse)
 async def upload_document(file: UploadFile = File(...)):
     """
-    Upload a document (PDF, TXT, DOCX).
+    Upload a document (PDF, TXT, DOCX, CSV, XLSX).
     Extracts text, indexes it, and stores metadata.
     """
     if not file.filename:
@@ -23,7 +23,7 @@ async def upload_document(file: UploadFile = File(...)):
     if not is_allowed_file(file.filename):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="File type not allowed. Accepted: pdf, txt, docx",
+            detail="File type not allowed. Accepted: pdf, txt, docx, csv, xlsx",
         )
 
     try:
@@ -83,6 +83,8 @@ async def download_document(doc_id: str, inline: bool = False):
         "pdf": "application/pdf",
         "txt": "text/plain",
         "docx": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        "csv": "text/csv",
+        "xlsx": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
     }
     media_type = media_types.get(doc.file_type, "application/octet-stream")
 

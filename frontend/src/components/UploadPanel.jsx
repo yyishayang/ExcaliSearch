@@ -36,10 +36,10 @@ export default function UploadPanel({ onUploadComplete, compact = false }) {
     }
 
     const uploadFile = async (file) => {
-        const allowed = ['pdf', 'txt', 'docx']
+        const allowed = ['pdf', 'txt', 'docx', 'csv', 'xlsx']
         const ext = file.name.split('.').pop().toLowerCase()
         if (!allowed.includes(ext)) {
-            setMessage({ type: 'error', text: `File type .${ext} not supported. Use: PDF, TXT, DOCX` })
+            setMessage({ type: 'error', text: `File type .${ext} not supported. Use: PDF, TXT, DOCX, CSV, XLSX` })
             return
         }
 
@@ -125,7 +125,7 @@ export default function UploadPanel({ onUploadComplete, compact = false }) {
                             Drag & drop a file here or <strong>click to browse</strong>
                         </div>
                         <div className="upload-zone__formats">
-                            Supported formats: PDF, TXT, DOCX
+                            Supported formats: PDF, TXT, DOCX, CSV, XLSX
                         </div>
                     </>
                 )}
@@ -137,7 +137,7 @@ export default function UploadPanel({ onUploadComplete, compact = false }) {
                 <input
                     ref={fileInputRef}
                     type="file"
-                    accept=".pdf,.txt,.docx"
+                    accept=".pdf,.txt,.docx,.csv,.xlsx"
                     onChange={handleFileSelect}
                 />
             </div>

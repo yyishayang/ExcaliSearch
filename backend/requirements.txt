@@ -6,3 +6,4 @@ Whoosh
 python-docx
 chromadb
 sentence-transformers
+openpyxl
