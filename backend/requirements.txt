@@ -4,3 +4,7 @@ python-multipart
 PyMuPDF
 Whoosh
 python-docx
+openpyxl
+# OCR support (required only when EXCALISEARCH_OCR=1)
+pytesseract
+Pillow
