@@ -1,17 +1,15 @@
 # Logs
-logs
-*.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
-lerna-debug.log*
 package-lock.json
 
 node_modules
 dist
 dist-ssr
 *.local
+venv
+__pycache__
+whoosh_index/
+storage/
+data/
 
 # Editor directories and files
 .vscode/*
