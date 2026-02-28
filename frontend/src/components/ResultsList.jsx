@@ -15,10 +15,26 @@ const API_BASE = '/api'
 function formatSnippet(snippet, query) {
     if (!snippet || !query) return snippet || ''
 
+    const stopwords = new Set([
+        // Español
+        'el', 'la', 'los', 'las', 'un', 'una', 'unos', 'unas',
+        'de', 'del', 'al', 'a', 'en', 'con', 'por', 'para', 'sin', 'sobre',
+        'desde', 'hasta', 'entre', 'hacia', 'bajo', 'tras',
+        'y', 'o', 'u', 'e', 'ni', 'que', 'si', 'pero', 'aunque',
+        'este', 'ese', 'aquel', 'esta', 'esa', 'aquella',
+        'es', 'son', 'ser', 'estar', 'hay', 'he', 'ha', 'han',
+        // Inglés
+        'the', 'a', 'an', 'and', 'or', 'but', 'in', 'on', 'at',
+        'to', 'for', 'of', 'with', 'by', 'from', 'as', 'is', 'are',
+        'was', 'were', 'be', 'been', 'being', 'have', 'has', 'had',
+        'this', 'that', 'these', 'those', 'if', 'then', 'so'
+    ])
+
     // Build a regex from query terms to find matches (case-insensitive)
+    // Filtrar stopwords y términos muy cortos
     const terms = query
         .split(/\s+/)
-        .filter(t => t.length > 1)
+        .filter(t => t.length > 2 && !stopwords.has(t.toLowerCase()))
         .map(t => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
 
     if (terms.length === 0) return snippet

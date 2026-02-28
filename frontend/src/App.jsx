@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
-import { HiShieldCheck, HiOutlineFolderOpen, HiSearch, HiOutlineDocumentSearch, HiInbox } from 'react-icons/hi'
-import { FaFilePdf, FaFileWord, FaFileAlt } from 'react-icons/fa'
+import { HiShieldCheck, HiOutlineFolderOpen, HiOutlineDocumentSearch, HiInbox, HiTrash } from 'react-icons/hi'
+import { FaFilePdf, FaFileWord, FaFileAlt, FaFileExcel, FaFileCsv } from 'react-icons/fa'
 import './App.css'
 import UploadPanel from './components/UploadPanel'
 import SearchBar from './components/SearchBar'
@@ -64,7 +64,7 @@ function App() {
   }, [loadDocuments])
 
   // Search handler
-  const handleSearch = useCallback(async (query) => {
+  const handleSearch = useCallback(async (query, mode = 'hybrid') => {
     setSearchQuery(query)
 
     if (!query) {
@@ -74,7 +74,9 @@ function App() {
 
     setLoading(true)
     try {
-      const res = await fetch(`${API_BASE}/search?q=${encodeURIComponent(query)}`)
+      const res = await fetch(
+        `${API_BASE}/search?q=${encodeURIComponent(query)}&mode=${encodeURIComponent(mode)}`
+      )
       if (res.ok) {
         const text = await res.text()
         try {
@@ -117,7 +119,9 @@ function App() {
   const typeIcons = {
     pdf: <FaFilePdf className="text-red-500" />,
     txt: <FaFileAlt className="text-green-500" />,
-    docx: <FaFileWord className="text-blue-500" />
+    docx: <FaFileWord className="text-blue-500" />,
+    xlsx: <FaFileExcel className="text-emerald-500" />,
+    csv: <FaFileCsv className="text-emerald-600" />
   }
 
   // Filter & Sort helper
@@ -172,6 +176,8 @@ function App() {
             <option value="pdf">PDF</option>
             <option value="txt">Texto</option>
             <option value="docx">Word</option>
+            <option value="xlsx">Excel</option>
+            <option value="csv">CSV</option>
           </select>
         </div>
         <div className="filters-bar__group">
@@ -193,6 +199,13 @@ function App() {
         {loading && (
           <div className="empty-state">
             <div className="spinner" />
+          </div>
+        )}
+
+        {/* Upload Panel - Visible cuando no hay búsqueda activa */}
+        {!searchResults && !loading && (
+          <div className="upload-section">
+            <UploadPanel onUploadComplete={handleUploadComplete} compact={false} />
           </div>
         )}
 
@@ -224,9 +237,6 @@ function App() {
               <h2 className="explorer-section__title">
                 <HiOutlineFolderOpen className="text-accent" /> Explorador de Archivos {displayedDocs.length > 0 && `(${displayedDocs.length})`}
               </h2>
-              <div className="explorer-section__actions">
-                <UploadPanel onUploadComplete={handleUploadComplete} compact={true} />
-              </div>
             </div>
 
             {displayedDocs.length > 0 ? (
@@ -237,6 +247,16 @@ function App() {
                     className="doc-card"
                     onClick={() => setSelectedDocId(doc.id)}
                   >
+                    <button
+                      className="doc-card__delete"
+                      title="Eliminar documento"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDelete(doc.id);
+                      }}
+                    >
+                      <HiTrash size={16} />
+                    </button>
                     <div className="doc-card__icon text-5xl mb-2">{typeIcons[doc.file_type] || <FaFileAlt />}</div>
                     <div className="doc-card__name" title={doc.original_name}>{doc.original_name}</div>
                     <div className="doc-card__meta">
