@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
+import { HiSearch, HiXCircle, HiSparkles } from 'react-icons/hi'
 
 export default function SearchBar({ onSearch, resultCount }) {
     const [query, setQuery] = useState('')
@@ -32,7 +33,9 @@ export default function SearchBar({ onSearch, resultCount }) {
     return (
         <div className="search-section">
             <div className="search-bar">
-                <span className="search-bar__icon">Q</span>
+                <span className="search-bar__icon">
+                    <HiSearch size={20} />
+                </span>
                 <input
                     className="search-bar__input"
                     type="text"
@@ -56,7 +59,7 @@ export default function SearchBar({ onSearch, resultCount }) {
                         onClick={handleClear}
                         title="Clear search"
                     >
-                        x
+                        <HiXCircle size={18} />
                     </button>
                 )}
             </div>
@@ -64,6 +67,7 @@ export default function SearchBar({ onSearch, resultCount }) {
             {query.trim() && resultCount !== null && (
                 <div className="search-info">
                     <span className="search-info__count">
+                        <HiSparkles className="inline mr-1 text-accent" />
                         <strong>{resultCount}</strong> result{resultCount !== 1 ? 's' : ''} found
                     </span>
                     <span className="search-info__count">Mode: {mode}</span>

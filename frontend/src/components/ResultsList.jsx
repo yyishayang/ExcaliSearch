@@ -1,3 +1,7 @@
+import { HiEye, HiDownload, HiTrash } from 'react-icons/hi'
+import { FaFilePdf, FaFileWord, FaFileAlt } from 'react-icons/fa'
+import { BiTargetLock } from 'react-icons/bi'
+
 const API_BASE = '/api'
 
 /**
@@ -37,7 +41,11 @@ export default function ResultsList({ results, query, onSelect, onDelete }) {
         return null
     }
 
-    const typeIcons = { pdf: '📕', txt: '📝', docx: '📘' }
+    const typeIcons = {
+        pdf: <FaFilePdf className="text-red-500" />,
+        txt: <FaFileAlt className="text-green-500" />,
+        docx: <FaFileWord className="text-blue-500" />
+    }
 
     return (
         <div className="results-list">
@@ -52,10 +60,13 @@ export default function ResultsList({ results, query, onSelect, onDelete }) {
                             <span className={`result-card__type result-card__type--${result.file_type}`}>
                                 {result.file_type.toUpperCase()}
                             </span>
-                            <span>{result.original_name}</span>
+                            <span className="flex items-center gap-2">
+                                {typeIcons[result.file_type] || <FaFileAlt />}
+                                {result.original_name}
+                            </span>
                         </div>
-                        <span className="result-card__score">
-                            Score: {result.score.toFixed(2)}
+                        <span className="result-card__score flex items-center gap-1">
+                            <BiTargetLock className="text-accent" /> {result.score.toFixed(2)}
                         </span>
                     </div>
 
@@ -71,7 +82,7 @@ export default function ResultsList({ results, query, onSelect, onDelete }) {
                                 onSelect(result.doc_id)
                             }}
                         >
-                            👁 View
+                            <HiEye className="mr-1" /> View
                         </button>
                         <a
                             className="btn btn--ghost"
@@ -80,7 +91,7 @@ export default function ResultsList({ results, query, onSelect, onDelete }) {
                             rel="noopener noreferrer"
                             onClick={(e) => e.stopPropagation()}
                         >
-                            ⬇ Download
+                            <HiDownload className="mr-1" /> Download
                         </a>
                         <button
                             className="btn btn--danger"
@@ -89,7 +100,7 @@ export default function ResultsList({ results, query, onSelect, onDelete }) {
                                 onDelete(result.doc_id)
                             }}
                         >
-                            🗑
+                            <HiTrash />
                         </button>
                     </div>
                 </div>
