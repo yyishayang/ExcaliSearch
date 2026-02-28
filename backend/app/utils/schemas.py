@@ -67,3 +67,22 @@ class ErrorResponse(BaseModel):
     """Standard error response."""
 
     detail: str
+
+
+class BatchUploadResult(BaseModel):
+    """Result for a single file in batch upload."""
+    
+    filename: str
+    status: str  # "success" or "error"
+    doc_id: Optional[str] = None
+    error: Optional[str] = None
+    word_count: Optional[int] = None
+
+
+class BatchUploadResponse(BaseModel):
+    """Response for batch upload operation."""
+    
+    total_files: int
+    successful: int
+    failed: int
+    results: List[BatchUploadResult]

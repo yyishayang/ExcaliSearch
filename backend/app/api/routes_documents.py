@@ -1,9 +1,10 @@
+from typing import List
 from fastapi import APIRouter, UploadFile, File, HTTPException, status
 from fastapi.responses import FileResponse
 
 from app.utils.file_utils import get_file_path, is_allowed_file
 from app.utils.database import list_documents, get_document
-from app.utils.schemas import UploadResponse, DocumentListItem
+from app.utils.schemas import UploadResponse, DocumentListItem, BatchUploadResponse, BatchUploadResult
 from app.services.document_service import process_upload, remove_document
 
 router = APIRouter(prefix="/api/documents", tags=["Documents"])
@@ -41,6 +42,72 @@ async def upload_document(file: UploadFile = File(...)):
         file_type=doc.file_type,
         file_size=doc.file_size,
         upload_date=doc.upload_date,
+    )
+
+
+@router.post("/upload/batch", response_model=BatchUploadResponse)
+async def upload_multiple_documents(files: List[UploadFile] = File(...)):
+    """
+    Upload multiple documents at once.
+    Processes each file and returns detailed results for each upload.
+    
+    Returns:
+        BatchUploadResponse with statistics and individual file results
+    """
+    if not files:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="No files provided",
+        )
+    
+    results = []
+    successful = 0
+    failed = 0
+    
+    for file in files:
+        # Skip files without name
+        if not file.filename:
+            results.append(BatchUploadResult(
+                filename="<unknown>",
+                status="error",
+                error="No filename provided"
+            ))
+            failed += 1
+            continue
+        
+        # Check file type
+        if not is_allowed_file(file.filename):
+            results.append(BatchUploadResult(
+                filename=file.filename,
+                status="error",
+                error="File type not allowed"
+            ))
+            failed += 1
+            continue
+        
+        # Process file
+        try:
+            doc = await process_upload(file)
+            results.append(BatchUploadResult(
+                filename=file.filename,
+                status="success",
+                doc_id=doc.id,
+                word_count=doc.word_count
+            ))
+            successful += 1
+        except Exception as e:
+            results.append(BatchUploadResult(
+                filename=file.filename,
+                status="error",
+                error=str(e)
+            ))
+            failed += 1
+    
+    return BatchUploadResponse(
+        total_files=len(files),
+        successful=successful,
+        failed=failed,
+        results=results
     )
 
 

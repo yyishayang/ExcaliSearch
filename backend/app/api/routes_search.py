@@ -9,9 +9,9 @@ router = APIRouter(prefix="/api", tags=["Search"])
 @router.get("/search", response_model=SearchResponse)
 async def search_documents(
     q: str = Query(..., min_length=1, description="Search query"),
-    mode: Literal["normal", "semantic"] = Query(
+    mode: Literal["normal", "semantic", "hybrid"] = Query(
         "semantic",
-        description="Search mode: normal (Whoosh) or semantic (Chroma + embeddings)",
+        description="Search mode: normal (Whoosh), semantic (Chroma + embeddings), or hybrid (both combined)",
     ),
 ):
     """

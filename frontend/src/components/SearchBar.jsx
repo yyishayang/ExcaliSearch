@@ -3,7 +3,7 @@ import { HiSearch, HiXCircle, HiSparkles } from 'react-icons/hi'
 
 export default function SearchBar({ onSearch, resultCount }) {
     const [query, setQuery] = useState('')
-    const [mode, setMode] = useState('semantic')
+    const [mode, setMode] = useState('hybrid')
     const debounceRef = useRef(null)
 
     useEffect(() => {
@@ -30,6 +30,24 @@ export default function SearchBar({ onSearch, resultCount }) {
         onSearch('', mode)
     }
 
+    const getModeLabel = (mode) => {
+        switch(mode) {
+            case 'hybrid': return 'Hybrid'
+            case 'semantic': return 'Semantic'
+            case 'normal': return 'Keywords'
+            default: return mode
+        }
+    }
+
+    const getModeDescription = (mode) => {
+        switch(mode) {
+            case 'hybrid': return 'Combines AI understanding + exact keywords (70% semantic + 30% keywords)'
+            case 'semantic': return 'AI-powered search that understands meaning and concepts'
+            case 'normal': return 'Traditional keyword matching'
+            default: return ''
+        }
+    }
+
     return (
         <div className="search-section">
             <div className="search-bar">
@@ -49,9 +67,11 @@ export default function SearchBar({ onSearch, resultCount }) {
                     value={mode}
                     onChange={(e) => setMode(e.target.value)}
                     aria-label="Search mode"
+                    title="Choose search mode"
                 >
+                    <option value="hybrid">Hybrid</option>
                     <option value="semantic">Semantic</option>
-                    <option value="normal">Normal</option>
+                    <option value="normal">Keywords</option>
                 </select>
                 {query && (
                     <button
@@ -70,7 +90,9 @@ export default function SearchBar({ onSearch, resultCount }) {
                         <HiSparkles className="inline mr-1 text-accent" />
                         <strong>{resultCount}</strong> result{resultCount !== 1 ? 's' : ''} found
                     </span>
-                    <span className="search-info__count">Mode: {mode}</span>
+                    <span className="search-info__mode" title={getModeDescription(mode)}>
+                        Mode: {getModeLabel(mode)}
+                    </span>
                 </div>
             )}
         </div>

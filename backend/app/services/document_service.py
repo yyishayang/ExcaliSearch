@@ -136,3 +136,27 @@ def remove_document(doc_id: str) -> bool:
     _text_cache.pop(doc_id, None)
 
     return True
+
+
+def cleanup_orphaned_documents() -> list[str]:
+    """
+    Detecta y elimina documentos cuyo fichero ya no existe en disco.
+    Se llama automáticamente al arrancar el servidor.
+    Devuelve la lista de doc_ids eliminados.
+    """
+    from app.utils.database import list_documents
+    removed_ids: list[str] = []
+
+    for doc in list_documents():
+        if not get_file_path(doc.filename).exists():
+            try:
+                delete_from_index(doc.id)
+                delete_document_chunks(doc.id)
+                db_delete(doc.id)
+                _text_cache.pop(doc.id, None)
+                removed_ids.append(doc.id)
+                print(f"[startup] removed orphan: {doc.original_name} ({doc.id})")
+            except Exception as exc:
+                print(f"[startup] could not remove orphan {doc.id}: {exc}")
+
+    return removed_ids

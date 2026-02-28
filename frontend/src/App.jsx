@@ -29,7 +29,6 @@ function App() {
   const [documents, setDocuments] = useState([])
   const [searchResults, setSearchResults] = useState(null)
   const [searchQuery, setSearchQuery] = useState('')
-  const [searchMode, setSearchMode] = useState('semantic')
   const [selectedDocId, setSelectedDocId] = useState(null)
   const [loading, setLoading] = useState(false)
   const [filterType, setFilterType] = useState('all')
@@ -65,9 +64,8 @@ function App() {
   }, [loadDocuments])
 
   // Search handler
-  const handleSearch = useCallback(async (query, mode = 'semantic') => {
+  const handleSearch = useCallback(async (query, mode = 'hybrid') => {
     setSearchQuery(query)
-    setSearchMode(mode)
 
     if (!query) {
       setSearchResults(null)
@@ -204,6 +202,13 @@ function App() {
           </div>
         )}
 
+        {/* Upload Panel - Visible cuando no hay búsqueda activa */}
+        {!searchResults && !loading && (
+          <div className="upload-section">
+            <UploadPanel onUploadComplete={handleUploadComplete} compact={false} />
+          </div>
+        )}
+
         {/* Search Results */}
         {displayedResults && !loading && (
           <>
@@ -232,9 +237,6 @@ function App() {
               <h2 className="explorer-section__title">
                 <HiOutlineFolderOpen className="text-accent" /> Explorador de Archivos {displayedDocs.length > 0 && `(${displayedDocs.length})`}
               </h2>
-              <div className="explorer-section__actions">
-                <UploadPanel onUploadComplete={handleUploadComplete} compact={true} />
-              </div>
             </div>
 
             {displayedDocs.length > 0 ? (
