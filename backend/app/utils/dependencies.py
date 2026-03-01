@@ -1,17 +1,9 @@
-"""
-FastAPI dependency injection utilities.
-"""
-
 from fastapi import UploadFile, HTTPException, status
 
 from app.utils.file_utils import ALLOWED_EXTENSIONS, get_file_extension
 
 
 def validate_upload_file(file: UploadFile) -> UploadFile:
-    """
-    Validate an uploaded file's extension.
-    Raises HTTPException if the file type is not allowed.
-    """
     if not file.filename:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,

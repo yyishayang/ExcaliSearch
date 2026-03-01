@@ -13,7 +13,6 @@ export default function ThemeSwitcher({ currentTheme, onThemeChange }) {
     const currentThemeData = themes[currentIndex] || themes[0]
 
     const handleCycle = (e) => {
-        // Only cycle if clicking the main icon area, or clicking the current one
         const nextIndex = (currentIndex + 1) % themes.length
         onThemeChange(themes[nextIndex].id)
     }

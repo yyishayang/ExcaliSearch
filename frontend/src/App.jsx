@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
-import { HiShieldCheck, HiOutlineFolderOpen, HiSearch, HiOutlineDocumentSearch, HiInbox } from 'react-icons/hi'
-import { FaFilePdf, FaFileWord, FaFileAlt } from 'react-icons/fa'
+import { HiShieldCheck, HiOutlineFolderOpen, HiOutlineDocumentSearch, HiInbox, HiTrash } from 'react-icons/hi'
+import { FaFilePdf, FaFileWord, FaFileAlt, FaFileExcel, FaFileCsv } from 'react-icons/fa'
 import './App.css'
 import UploadPanel from './components/UploadPanel'
 import SearchBar from './components/SearchBar'
@@ -33,15 +33,16 @@ function App() {
   const [loading, setLoading] = useState(false)
   const [filterType, setFilterType] = useState('all')
   const [sortBy, setSortBy] = useState('default')
+  const [startDate, setStartDate] = useState('')
+  const [endDate, setEndDate] = useState('')
+  const [searchIn, setSearchIn] = useState('content')
   const [theme, setTheme] = useState(localStorage.getItem('theme') || 'forest')
 
-  // Theme effect
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme)
     localStorage.setItem('theme', theme)
   }, [theme])
 
-  // Load document list
   const loadDocuments = useCallback(async () => {
     try {
       const res = await fetch(`${API_BASE}/documents`)
@@ -63,8 +64,7 @@ function App() {
     loadDocuments()
   }, [loadDocuments])
 
-  // Search handler
-  const handleSearch = useCallback(async (query) => {
+  const handleSearch = useCallback(async (query, mode = 'hybrid') => {
     setSearchQuery(query)
 
     if (!query) {
@@ -74,7 +74,9 @@ function App() {
 
     setLoading(true)
     try {
-      const res = await fetch(`${API_BASE}/search?q=${encodeURIComponent(query)}`)
+      const res = await fetch(
+        `${API_BASE}/search?q=${encodeURIComponent(query)}&mode=${encodeURIComponent(mode)}`
+      )
       if (res.ok) {
         const text = await res.text()
         try {
@@ -91,7 +93,6 @@ function App() {
     }
   }, [])
 
-  // Delete handler
   const handleDelete = useCallback(async (docId) => {
     if (!confirm('Are you sure you want to delete this document?')) return
 
@@ -99,7 +100,6 @@ function App() {
       const res = await fetch(`${API_BASE}/documents/${docId}`, { method: 'DELETE' })
       if (res.ok) {
         loadDocuments()
-        // Remove from search results if present
         if (searchResults) {
           setSearchResults(prev => prev.filter(r => r.doc_id !== docId))
         }
@@ -109,7 +109,6 @@ function App() {
     }
   }, [searchResults, loadDocuments])
 
-  // After upload, refresh list
   const handleUploadComplete = useCallback(() => {
     loadDocuments()
   }, [loadDocuments])
@@ -117,13 +116,46 @@ function App() {
   const typeIcons = {
     pdf: <FaFilePdf className="text-red-500" />,
     txt: <FaFileAlt className="text-green-500" />,
-    docx: <FaFileWord className="text-blue-500" />
+    docx: <FaFileWord className="text-blue-500" />,
+    xlsx: <FaFileExcel className="text-emerald-500" />,
+    csv: <FaFileCsv className="text-emerald-600" />
   }
 
-  // Filter & Sort helper
-  const getFilteredAndSorted = (list) => {
+  const getFilteredAndSorted = (list, isSearchList = false) => {
     if (!list) return list;
-    let result = list.filter(item => filterType === 'all' || item.file_type === filterType);
+    let result = list.filter(item => {
+      let typeMatch = filterType === 'all' || item.file_type === filterType;
+
+      let dateMatch = true;
+      if (startDate || endDate) {
+        const docDateStr = item.upload_date || item.created_at || '';
+        if (docDateStr) {
+          const docDate = new Date(docDateStr);
+          docDate.setHours(0, 0, 0, 0);
+
+          if (startDate) {
+            const start = new Date(startDate);
+            start.setHours(0, 0, 0, 0);
+            if (docDate < start) dateMatch = false;
+          }
+          if (endDate) {
+            const end = new Date(endDate);
+            end.setHours(0, 0, 0, 0);
+            if (docDate > end) dateMatch = false;
+          }
+        }
+      }
+
+      let titleSearchMatch = true;
+      if (isSearchList && searchIn === 'title' && searchQuery) {
+        const normalizeText = (text) => text.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+        const queryNormalized = normalizeText(searchQuery);
+        const itemNameNormalized = normalizeText(item.original_name || item.filename || '');
+        titleSearchMatch = itemNameNormalized.includes(queryNormalized);
+      }
+
+      return typeMatch && dateMatch && titleSearchMatch;
+    });
 
     if (sortBy !== 'default') {
       result = [...result].sort((a, b) => {
@@ -135,12 +167,11 @@ function App() {
     return result;
   };
 
-  const displayedDocs = getFilteredAndSorted(documents);
-  const displayedResults = searchResults ? getFilteredAndSorted(searchResults) : null;
+  const displayedDocs = getFilteredAndSorted(documents, false);
+  const displayedResults = searchResults ? getFilteredAndSorted(searchResults, true) : null;
 
   return (
     <div className="app">
-      {/* Top Banner */}
       <header className="top-banner">
         <div className="top-banner__brand">
           <span className="top-banner__icon">
@@ -151,7 +182,7 @@ function App() {
         <div className="top-banner__search">
           <SearchBar
             onSearch={handleSearch}
-            resultCount={searchResults ? searchResults.length : null}
+            resultCount={searchResults ? displayedResults.length : null}
           />
         </div>
         <div className="top-banner__theme">
@@ -159,44 +190,78 @@ function App() {
         </div>
       </header>
 
-      {/* Filters Bar */}
       <div className="filters-bar">
         <div className="filters-bar__group">
-          <label className="filters-bar__label">Tipo:</label>
+          <label className="filters-bar__label">Search in:</label>
+          <select
+            value={searchIn}
+            onChange={e => setSearchIn(e.target.value)}
+            className="filters-bar__select"
+          >
+            <option value="content">Content</option>
+            <option value="title">Title only</option>
+          </select>
+        </div>
+        <div className="filters-bar__group">
+          <label className="filters-bar__label">Type:</label>
           <select
             value={filterType}
             onChange={e => setFilterType(e.target.value)}
             className="filters-bar__select"
           >
-            <option value="all">Todos</option>
+            <option value="all">All</option>
             <option value="pdf">PDF</option>
-            <option value="txt">Texto</option>
+            <option value="txt">Text</option>
             <option value="docx">Word</option>
+            <option value="xlsx">Excel</option>
+            <option value="csv">CSV</option>
           </select>
         </div>
         <div className="filters-bar__group">
-          <label className="filters-bar__label">Ordenar por:</label>
+          <label className="filters-bar__label">From:</label>
+          <input
+            type="date"
+            value={startDate}
+            onChange={e => setStartDate(e.target.value)}
+            className="filters-bar__input"
+          />
+        </div>
+        <div className="filters-bar__group">
+          <label className="filters-bar__label">To:</label>
+          <input
+            type="date"
+            value={endDate}
+            onChange={e => setEndDate(e.target.value)}
+            className="filters-bar__input"
+          />
+        </div>
+        <div className="filters-bar__group">
+          <label className="filters-bar__label">Sort by:</label>
           <select
             value={sortBy}
             onChange={e => setSortBy(e.target.value)}
             className="filters-bar__select"
           >
-            <option value="default">Por defecto</option>
-            <option value="name">Nombre</option>
-            <option value="size">Tamaño</option>
+            <option value="default">Default</option>
+            <option value="name">Name</option>
+            <option value="size">Size</option>
           </select>
         </div>
       </div>
 
       <main className="main-content">
-        {/* Loading */}
         {loading && (
           <div className="empty-state">
             <div className="spinner" />
           </div>
         )}
 
-        {/* Search Results */}
+        {!searchResults && !loading && (
+          <div className="upload-section">
+            <UploadPanel onUploadComplete={handleUploadComplete} compact={false} />
+          </div>
+        )}
+
         {displayedResults && !loading && (
           <>
             {displayedResults.length > 0 ? (
@@ -217,16 +282,12 @@ function App() {
           </>
         )}
 
-        {/* Document Explorer (when not searching) */}
         {!searchResults && !loading && (
           <div className="explorer-section">
             <div className="explorer-section__header">
               <h2 className="explorer-section__title">
-                <HiOutlineFolderOpen className="text-accent" /> Explorador de Archivos {displayedDocs.length > 0 && `(${displayedDocs.length})`}
+                <HiOutlineFolderOpen className="text-accent" /> Documents Explorer {displayedDocs.length > 0 && `(${displayedDocs.length})`}
               </h2>
-              <div className="explorer-section__actions">
-                <UploadPanel onUploadComplete={handleUploadComplete} compact={true} />
-              </div>
             </div>
 
             {displayedDocs.length > 0 ? (
@@ -237,6 +298,16 @@ function App() {
                     className="doc-card"
                     onClick={() => setSelectedDocId(doc.id)}
                   >
+                    <button
+                      className="doc-card__delete"
+                      title="Delete document"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDelete(doc.id);
+                      }}
+                    >
+                      <HiTrash size={16} />
+                    </button>
                     <div className="doc-card__icon text-5xl mb-2">{typeIcons[doc.file_type] || <FaFileAlt />}</div>
                     <div className="doc-card__name" title={doc.original_name}>{doc.original_name}</div>
                     <div className="doc-card__meta">
@@ -251,14 +322,13 @@ function App() {
                 <div className="empty-state__icon">
                   <HiInbox size={48} className="mx-auto opacity-20" />
                 </div>
-                <p className="empty-state__text">Esta carpeta está vacía. ¡Sube tu primer archivo!</p>
+                <p className="empty-state__text">This folder is empty. Upload your first document!</p>
               </div>
             )}
           </div>
         )}
       </main>
 
-      {/* Document Viewer Modal */}
       {selectedDocId && (
         <DocumentViewer
           docId={selectedDocId}

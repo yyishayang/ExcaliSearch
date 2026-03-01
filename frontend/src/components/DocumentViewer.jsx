@@ -1,12 +1,11 @@
 import { useState, useEffect, useRef } from 'react'
 import { renderAsync } from 'docx-preview'
-import { HiDatabase, HiPencilAlt, HiDocumentText, HiClock, HiDownload, HiX } from 'react-icons/hi'
+import * as XLSX from 'xlsx'
+import Spreadsheet from "react-spreadsheet";
+import { HiDatabase, HiPencilAlt, HiDocumentText, HiClock, HiDownload, HiX, HiTable } from 'react-icons/hi'
 
 const API_BASE = '/api'
 
-/**
- * Highlight query terms within document text.
- */
 function highlightText(text, query) {
     if (!text || !query) return text || ''
 
@@ -47,6 +46,8 @@ export default function DocumentViewer({ docId, query, onClose }) {
     const [doc, setDoc] = useState(null)
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState(null)
+    const [spreadsheetData, setSpreadsheetData] = useState(null) // { sheetNames: [], sheets: { name: [[cell]] } }
+    const [activeSheet, setActiveSheet] = useState(0)
     const docxContainerRef = useRef(null)
 
     // Fetch document metadata (and render DOCX if applicable)
@@ -56,6 +57,7 @@ export default function DocumentViewer({ docId, query, onClose }) {
         const fetchDoc = async () => {
             setLoading(true)
             setError(null)
+            setSpreadsheetData(null)
             try {
                 const res = await fetch(`${API_BASE}/documents/${docId}`)
                 if (!res.ok) throw new Error('Failed to load document')
@@ -85,6 +87,30 @@ export default function DocumentViewer({ docId, query, onClose }) {
                         }
                     }, 50)
                 }
+
+                // If spreadsheet (xlsx, csv), fetch binary and parse with XLSX
+                if (data.file_type === 'xlsx' || data.file_type === 'csv') {
+                    const fileRes = await fetch(`${API_BASE}/documents/${docId}/download?inline=true`)
+                    if (!fileRes.ok) throw new Error('Failed to fetch spreadsheet file')
+                    const arrayBuffer = await fileRes.arrayBuffer()
+                    const workbook = XLSX.read(arrayBuffer, { type: 'array' })
+
+                    const sheetsMap = {}
+                    workbook.SheetNames.forEach(name => {
+                        const sheet = workbook.Sheets[name]
+                        const jsonData = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: "" })
+                        // Transform to react-spreadsheet format
+                        sheetsMap[name] = jsonData.map(row =>
+                            row.map(cell => ({ value: String(cell) }))
+                        )
+                    })
+
+                    setSpreadsheetData({
+                        sheetNames: workbook.SheetNames,
+                        sheets: sheetsMap
+                    })
+                    setActiveSheet(0)
+                }
             } catch (err) {
                 setError(err.message)
             } finally {
@@ -95,7 +121,6 @@ export default function DocumentViewer({ docId, query, onClose }) {
         fetchDoc()
     }, [docId])
 
-    // Close on Escape key
     useEffect(() => {
         const handleKey = (e) => {
             if (e.key === 'Escape') onClose()
@@ -103,6 +128,34 @@ export default function DocumentViewer({ docId, query, onClose }) {
         window.addEventListener('keydown', handleKey)
         return () => window.removeEventListener('keydown', handleKey)
     }, [onClose])
+
+    const renderSpreadsheet = () => {
+        if (!spreadsheetData) return null;
+
+        const sheetName = spreadsheetData.sheetNames[activeSheet];
+        const data = spreadsheetData.sheets[sheetName];
+
+        return (
+            <div className="viewer__spreadsheet-comp">
+                {spreadsheetData.sheetNames.length > 1 && (
+                    <div className="viewer__spreadsheet-tabs">
+                        {spreadsheetData.sheetNames.map((name, i) => (
+                            <button
+                                key={name}
+                                className={`viewer__spreadsheet-tab ${activeSheet === i ? 'viewer__spreadsheet-tab--active' : ''}`}
+                                onClick={() => setActiveSheet(i)}
+                            >
+                                <HiTable /> {name}
+                            </button>
+                        ))}
+                    </div>
+                )}
+                <div className="viewer__spreadsheet-grid">
+                    <Spreadsheet data={data} />
+                </div>
+            </div>
+        );
+    };
 
     if (!docId) return null
 
@@ -165,6 +218,8 @@ export default function DocumentViewer({ docId, query, onClose }) {
                             />
                         ) : doc.file_type === 'docx' ? (
                             <div ref={docxContainerRef} className="viewer__docx-container" />
+                        ) : (doc.file_type === 'xlsx' || doc.file_type === 'csv') ? (
+                            renderSpreadsheet()
                         ) : (
                             <div className="viewer__text">
                                 {query ? highlightText(doc.content, query) : doc.content}

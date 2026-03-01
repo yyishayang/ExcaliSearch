@@ -8,3 +8,6 @@ openpyxl
 # OCR support (required only when EXCALISEARCH_OCR=1)
 pytesseract
 Pillow
+chromadb
+sentence-transformers
+openpyxl
