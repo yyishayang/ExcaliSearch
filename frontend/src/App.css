@@ -59,9 +59,23 @@
   letter-spacing: -0.02em;
 }
 
+.top-banner__logo-img {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+  filter: drop-shadow(0 0 8px var(--color-accent-glow));
+}
+
 .top-banner__search {
   width: 100%;
   max-width: 600px;
+}
+
+.top-banner__theme {
+  position: absolute;
+  right: var(--space-xl);
+  top: 50%;
+  transform: translateY(-50%);
 }
 
 /* Adjustments for Search section when inside top banner */
@@ -519,6 +533,12 @@
   overflow: hidden;
   box-shadow: var(--shadow-lg);
 }
+
+
+
+/* Vine Decorations Base */
+
+
 
 .explorer-section__header {
   display: flex;

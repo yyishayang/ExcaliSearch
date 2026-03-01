@@ -144,7 +144,7 @@ function App() {
       <header className="top-banner">
         <div className="top-banner__brand">
           <span className="top-banner__icon">
-            <HiShieldCheck size={28} className="text-accent" />
+            <img src="../public/excalibur.png" alt="Logo" className="top-banner__logo-img" />
           </span>
           <h1 className="top-banner__title">ExcaliSearch</h1>
         </div>
