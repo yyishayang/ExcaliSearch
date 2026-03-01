@@ -1,4 +1,4 @@
-import { HiEye, HiDownload, HiTrash } from 'react-icons/hi'
+import { HiEye, HiDownload, HiTrash, HiLightBulb } from 'react-icons/hi'
 import { FaFilePdf, FaFileWord, FaFileAlt } from 'react-icons/fa'
 import { BiTargetLock } from 'react-icons/bi'
 
@@ -86,8 +86,15 @@ export default function ResultsList({ results, query, onSelect, onDelete }) {
                         </span>
                     </div>
 
-                    <div className="result-card__snippet">
-                        {formatSnippet(result.snippet, query)}
+                    {result.summary && (
+                        <div className="result-card__summary-badge">
+                            <HiLightBulb size={14} />
+                            <span>Resumen automático</span>
+                        </div>
+                    )}
+
+                    <div className={`result-card__snippet ${result.summary ? 'result-card__snippet--summary' : ''}`}>
+                        {result.summary || formatSnippet(result.snippet, query)}
                     </div>
 
                     <div className="result-card__actions">

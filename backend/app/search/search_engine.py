@@ -32,6 +32,7 @@ def keyword_search(query: str, limit: int = 20) -> list[dict]:
             doc_meta = get_document(doc_id)
             original_name = doc_meta.original_name if doc_meta else hit["filename"]
             file_type = doc_meta.file_type if doc_meta else ""
+            summary = doc_meta.summary if doc_meta else ""
 
             if not snippet:
                 content = hit.get("content", "")
@@ -43,6 +44,7 @@ def keyword_search(query: str, limit: int = 20) -> list[dict]:
                     "filename": hit["filename"],
                     "original_name": original_name,
                     "snippet": snippet,
+                    "summary": summary,
                     "score": round(float(hit.score), 4),
                     "file_type": file_type,
                 }

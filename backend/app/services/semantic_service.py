@@ -359,6 +359,7 @@ def semantic_search(
             "filename": meta.get("filename", ""),
             "original_name": meta.get("original_name", meta.get("filename", "")),
             "snippet": snippet,
+            "summary": doc_meta.summary if doc_meta else "",
             "chunk_text": chunk_text,  # Guardamos el texto completo para reranking
             "score": round(score, 4),
             "file_type": meta.get("file_type", ""),

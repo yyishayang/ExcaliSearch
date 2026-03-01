@@ -772,6 +772,22 @@
   font-weight: 500;
 }
 
+.result-card__summary-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  background: linear-gradient(135deg, rgba(251, 191, 36, 0.15), rgba(245, 158, 11, 0.1));
+  border: 1px solid rgba(251, 191, 36, 0.3);
+  border-radius: var(--radius-sm);
+  font-size: 11px;
+  font-weight: 600;
+  color: rgba(251, 191, 36, 0.9);
+  margin-bottom: var(--space-sm);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
 .result-card__snippet {
   font-size: var(--font-size-sm);
   color: var(--color-text-secondary);
@@ -781,6 +797,14 @@
   -webkit-line-clamp: 3;
   line-clamp: 3;
   -webkit-box-orient: vertical;
+}
+
+.result-card__snippet--summary {
+  color: var(--color-text-primary);
+  font-weight: 400;
+  line-height: 1.8;
+  -webkit-line-clamp: 4;
+  line-clamp: 4;
 }
 
 .result-card__actions {

@@ -19,6 +19,7 @@ class SearchResult(BaseModel):
     filename: str
     original_name: str
     snippet: str  # highlighted text fragment
+    summary: str = ""  # document summary
     score: float
     file_type: str
 
