@@ -1,12 +1,13 @@
 import { useState, useEffect, useCallback } from 'react'
-import { HiShieldCheck, HiOutlineFolderOpen, HiOutlineDocumentSearch, HiInbox, HiTrash } from 'react-icons/hi'
-import { FaFilePdf, FaFileWord, FaFileAlt, FaFileExcel, FaFileCsv } from 'react-icons/fa'
+import { HiShieldCheck, HiOutlineFolderOpen, HiOutlineDocumentSearch, HiInbox, HiTrash, HiChat } from 'react-icons/hi'
+import { FaFilePdf, FaFileWord, FaFileAlt, FaFileExcel, FaFileCsv, FaRobot } from 'react-icons/fa'
 import './App.css'
 import UploadPanel from './components/UploadPanel'
 import SearchBar from './components/SearchBar'
 import ResultsList from './components/ResultsList'
 import DocumentViewer from './components/DocumentViewer'
 import ThemeSwitcher from './components/ThemeSwitcher'
+import ChatPanel from './components/ChatPanel'
 
 const API_BASE = '/api'
 
@@ -37,6 +38,7 @@ function App() {
   const [endDate, setEndDate] = useState('')
   const [searchIn, setSearchIn] = useState('content')
   const [theme, setTheme] = useState(localStorage.getItem('theme') || 'forest')
+  const [chatOpen, setChatOpen] = useState(false)
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme)
@@ -335,6 +337,22 @@ function App() {
           query={searchQuery}
           onClose={() => setSelectedDocId(null)}
         />
+      )}
+
+      {/* Chat floating button */}
+      {!chatOpen && (
+        <button 
+          className="chat-button-float"
+          onClick={() => setChatOpen(true)}
+          title="AI Chat"
+        >
+          <FaRobot />
+        </button>
+      )}
+
+      {/* Chat panel */}
+      {chatOpen && (
+        <ChatPanel onClose={() => setChatOpen(false)} />
       )}
     </div>
   )

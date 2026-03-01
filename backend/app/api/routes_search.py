@@ -36,6 +36,7 @@ async def search_documents(
                 filename=r["filename"],
                 original_name=r["original_name"],
                 snippet=r["snippet"],
+                summary=r.get("summary", ""),
                 score=r["score"],
                 file_type=r["file_type"],
             )
