@@ -1,0 +1,25 @@
+# SPDX-FileCopyrightText: 2026 @albabsuarez
+# SPDX-FileCopyrightText: 2026 @aslangallery
+# SPDX-FileCopyrightText: 2026 @david598Uni
+# SPDX-FileCopyrightText: 2026 @yyishayang
+#
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+fastapi
+uvicorn[standard]
+python-multipart
+PyMuPDF
+Whoosh
+python-docx
+openpyxl
+# OCR support (required only when EXCALISEARCH_OCR=1)
+pytesseract
+Pillow
+chromadb
+sentence-transformers
+openpyxl
+# Automatic summarization
+sumy
+nltk
+# LLM-based summarization (optional, requires Ollama running)
+ollama
