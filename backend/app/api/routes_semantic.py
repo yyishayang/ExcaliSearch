@@ -1,3 +1,10 @@
+# SPDX-FileCopyrightText: 2026 @albabsuarez
+# SPDX-FileCopyrightText: 2026 @aslangallery
+# SPDX-FileCopyrightText: 2026 @david598Uni
+# SPDX-FileCopyrightText: 2026 @yyishayang
+#
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 from fastapi import APIRouter, BackgroundTasks
 from app.services.semantic_service import _reindex_existing_documents, init_semantic_index, delete_document_chunks
 from app.services.indexing_service import delete_from_index

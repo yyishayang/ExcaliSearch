@@ -1,3 +1,10 @@
+// SPDX-FileCopyrightText: 2026 @albabsuarez
+// SPDX-FileCopyrightText: 2026 @aslangallery
+// SPDX-FileCopyrightText: 2026 @david598Uni
+// SPDX-FileCopyrightText: 2026 @yyishayang
+//
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 import { HiColorSwatch, HiMoon, HiSun, HiChip } from 'react-icons/hi'
 import { FaTree } from 'react-icons/fa'
 

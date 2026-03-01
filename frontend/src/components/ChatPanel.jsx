@@ -1,3 +1,10 @@
+// SPDX-FileCopyrightText: 2026 @albabsuarez
+// SPDX-FileCopyrightText: 2026 @aslangallery
+// SPDX-FileCopyrightText: 2026 @david598Uni
+// SPDX-FileCopyrightText: 2026 @yyishayang
+//
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 import { useState, useRef, useEffect } from 'react'
 import PropTypes from 'prop-types'
 import { HiPaperAirplane, HiX, HiRefresh, HiLightBulb, HiDocumentText } from 'react-icons/hi'
@@ -106,15 +113,6 @@ export default function ChatPanel({ onClose, documentContext = null }) {
         }
     }
 
-    const clearChat = () => {
-        setMessages([{
-            role: 'assistant',
-            content: documentContext
-                ? `Chat restarted. What else would you like to know about "${documentContext.name}"?`
-                : 'Chat restarted. How can I help you?'
-        }])
-    }
-
     const handleKeyDown = (e) => {
         if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault()
@@ -192,7 +190,7 @@ export default function ChatPanel({ onClose, documentContext = null }) {
                                     className="chat-toggle"
                                 />
                                 <span className="opacity-70">
-                                    🔍 Search in documents
+                                    Search in documents
                                 </span>
                             </label>
                         </div>

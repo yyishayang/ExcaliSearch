@@ -1,3 +1,10 @@
+# SPDX-FileCopyrightText: 2026 @albabsuarez
+# SPDX-FileCopyrightText: 2026 @aslangallery
+# SPDX-FileCopyrightText: 2026 @david598Uni
+# SPDX-FileCopyrightText: 2026 @yyishayang
+#
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 from typing import List
 from fastapi import APIRouter, UploadFile, File, HTTPException, status
 from fastapi.responses import FileResponse
