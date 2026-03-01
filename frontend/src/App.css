@@ -25,10 +25,18 @@
   justify-content: center;
   gap: var(--space-sm);
   padding: var(--space-md) var(--space-xl);
-  background: rgba(10, 10, 15, 0.85);
   background: var(--color-bg-card);
   backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--color-border);
+  transition: all var(--transition-base);
+}
+
+@media (max-width: 1024px) {
+  .top-banner {
+    flex-direction: column;
+    padding: var(--space-md);
+    gap: var(--space-md);
+  }
 }
 
 .top-banner__brand {
@@ -39,6 +47,14 @@
   display: flex;
   align-items: center;
   gap: var(--space-sm);
+}
+
+@media (max-width: 1024px) {
+  .top-banner__brand {
+    position: static;
+    transform: none;
+    justify-content: center;
+  }
 }
 
 .top-banner__icon {
@@ -71,11 +87,37 @@
   max-width: 600px;
 }
 
+@media (max-width: 1024px) {
+  .top-banner__search {
+    max-width: 100%;
+  }
+}
+
 .top-banner__theme {
   position: absolute;
   right: var(--space-xl);
   top: 50%;
   transform: translateY(-50%);
+}
+
+@media (max-width: 1024px) {
+  .top-banner__theme {
+    position: absolute;
+    top: var(--space-md);
+    right: var(--space-md);
+    transform: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .top-banner__logo-img {
+    width: 60px;
+    height: 60px;
+  }
+
+  .top-banner__title {
+    font-size: var(--font-size-lg);
+  }
 }
 
 /* Adjustments for Search section when inside top banner */
@@ -116,6 +158,42 @@
   top: 73px;
   /* approximate height of the top banner */
   z-index: 40;
+  transition: all var(--transition-base);
+}
+
+@media (max-width: 1024px) {
+  .filters-bar {
+    position: static;
+    max-width: 100%;
+    width: 100%;
+    flex-wrap: wrap;
+    justify-content: center;
+    padding: var(--space-md);
+    gap: var(--space-md);
+    border-radius: 0;
+  }
+
+  .filters-bar__group {
+    flex: 1 1 auto;
+    min-width: 140px;
+    justify-content: space-between;
+  }
+
+  .filters-bar__select,
+  .filters-bar__input {
+    flex: 1;
+    width: 100%;
+  }
+}
+
+@media (max-width: 640px) {
+  .filters-bar {
+    gap: var(--space-sm);
+  }
+
+  .filters-bar__group {
+    min-width: 100%;
+  }
 }
 
 .filters-bar__group {
@@ -1062,6 +1140,17 @@
   flex-direction: column;
   box-shadow: var(--shadow-lg);
   animation: scaleIn 0.25s ease;
+  overflow: hidden;
+}
+
+@media (max-width: 768px) {
+  .viewer {
+    width: 100vw;
+    height: 100vh;
+    max-height: 100vh;
+    border-radius: 0;
+    border: none;
+  }
 }
 
 .viewer__header {
@@ -1071,6 +1160,20 @@
   padding: var(--space-lg) var(--space-xl);
   border-bottom: 1px solid var(--color-border);
   flex-shrink: 0;
+}
+
+@media (max-width: 640px) {
+  .viewer__header {
+    padding: var(--space-md);
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-sm);
+  }
+
+  .viewer__actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
 }
 
 .viewer__title {
@@ -1115,11 +1218,10 @@
 
 .viewer__summary {
   padding: var(--space-xl);
-  background: linear-gradient(135deg, 
-    rgba(251, 191, 36, 0.12), 
-    rgba(245, 158, 11, 0.08),
-    rgba(251, 191, 36, 0.05)
-  );
+  background: linear-gradient(135deg,
+      rgba(251, 191, 36, 0.12),
+      rgba(245, 158, 11, 0.08),
+      rgba(251, 191, 36, 0.05));
   border-bottom: 2px solid rgba(251, 191, 36, 0.25);
   border-left: 4px solid rgba(251, 191, 36, 0.6);
   flex-shrink: 0;
@@ -1128,11 +1230,18 @@
   animation: fadeInDown 0.4s ease-out;
 }
 
+@media (max-width: 640px) {
+  .viewer__summary {
+    padding: var(--space-md);
+  }
+}
+
 @keyframes fadeInDown {
   from {
     opacity: 0;
     transform: translateY(-10px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -1146,12 +1255,11 @@
   left: 0;
   right: 0;
   height: 1px;
-  background: linear-gradient(90deg, 
-    transparent, 
-    rgba(251, 191, 36, 0.4) 20%, 
-    rgba(251, 191, 36, 0.4) 80%, 
-    transparent
-  );
+  background: linear-gradient(90deg,
+      transparent,
+      rgba(251, 191, 36, 0.4) 20%,
+      rgba(251, 191, 36, 0.4) 80%,
+      transparent);
 }
 
 .viewer__summary-header {
@@ -1285,6 +1393,7 @@
     opacity: 0;
     transform: translateY(-10px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -1366,11 +1475,11 @@
   appearance: none;
   width: 100%;
   height: 6px;
-  background: linear-gradient(to right, 
-    var(--color-accent) 0%, 
-    var(--color-accent) var(--value), 
-    var(--color-border) var(--value), 
-    var(--color-border) 100%);
+  background: linear-gradient(to right,
+      var(--color-accent) 0%,
+      var(--color-accent) var(--value),
+      var(--color-border) var(--value),
+      var(--color-border) 100%);
   border-radius: 3px;
   outline: none;
   cursor: pointer;
@@ -1679,6 +1788,22 @@
     padding: var(--space-md);
   }
 
+  .upload-section,
+  .explorer-section {
+    padding: var(--space-md);
+    margin-bottom: var(--space-lg);
+  }
+
+  .explorer-section__header {
+    padding: var(--space-sm) var(--space-md);
+  }
+
+  .doc-grid {
+    grid-template-columns: 1fr;
+    padding: var(--space-md);
+    gap: var(--space-md);
+  }
+
   .header__title {
     font-size: var(--font-size-2xl);
   }
@@ -1694,16 +1819,6 @@
   .search-bar__mode {
     margin-left: 0;
     max-width: 110px;
-  }
-
-  .viewer {
-    width: 95vw;
-    max-height: 90vh;
-    border-radius: var(--radius-md);
-  }
-
-  .doc-grid {
-    grid-template-columns: 1fr;
   }
 }
 
@@ -1808,11 +1923,10 @@
 
 /* Light theme adjustments for summary section */
 [data-theme='light'] .viewer__summary {
-  background: linear-gradient(135deg, 
-    rgba(251, 191, 36, 0.15), 
-    rgba(245, 158, 11, 0.1),
-    rgba(251, 191, 36, 0.08)
-  );
+  background: linear-gradient(135deg,
+      rgba(251, 191, 36, 0.15),
+      rgba(245, 158, 11, 0.1),
+      rgba(251, 191, 36, 0.08));
   border-left: 4px solid rgba(251, 191, 36, 0.8);
 }
 
@@ -1874,6 +1988,7 @@
     transform: translateY(100%);
     opacity: 0;
   }
+
   to {
     transform: translateY(0);
     opacity: 1;
@@ -1944,6 +2059,7 @@
     opacity: 0;
     transform: translateY(10px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -2021,10 +2137,14 @@
 }
 
 @keyframes typing {
-  0%, 60%, 100% {
+
+  0%,
+  60%,
+  100% {
     transform: translateY(0);
     opacity: 0.4;
   }
+
   30% {
     transform: translateY(-10px);
     opacity: 1;
@@ -2108,7 +2228,7 @@
     max-width: 100%;
     border-radius: 0;
   }
-  
+
   .chat-button-float {
     bottom: var(--space-lg);
     right: var(--space-lg);

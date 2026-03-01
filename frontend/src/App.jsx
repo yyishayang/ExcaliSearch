@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { HiShieldCheck, HiOutlineFolderOpen, HiOutlineDocumentSearch, HiInbox, HiTrash, HiChat } from 'react-icons/hi'
-import { FaFilePdf, FaFileWord, FaFileAlt, FaFileExcel, FaFileCsv, FaRobot } from 'react-icons/fa'
+import { FaFilePdf, FaFileWord, FaFileAlt, FaFileExcel, FaFileCsv, FaCrown } from 'react-icons/fa'
 import './App.css'
 import UploadPanel from './components/UploadPanel'
 import SearchBar from './components/SearchBar'
@@ -341,12 +341,12 @@ function App() {
 
       {/* Chat floating button */}
       {!chatOpen && (
-        <button 
+        <button
           className="chat-button-float"
           onClick={() => setChatOpen(true)}
-          title="AI Chat"
+          title="Arthur"
         >
-          <FaRobot />
+          <FaCrown />
         </button>
       )}
 

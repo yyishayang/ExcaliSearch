@@ -1,7 +1,3 @@
-"""
-Chat service with Ollama LLM integration.
-Provides conversational AI capabilities with document context awareness.
-"""
 import os
 from typing import Optional, List, Dict, Generator
 
@@ -25,7 +21,6 @@ RAG_TOP_K = 3  # Number of top documents to retrieve for RAG
 
 
 def is_chat_available() -> bool:
-    """Check if chat service is available."""
     if not OLLAMA_AVAILABLE or not CHAT_ENABLED:
         return False
     
@@ -39,12 +34,6 @@ def is_chat_available() -> bool:
 def get_document_context(doc_ids: List[str]) -> str:
     """
     Get context from specified documents for RAG-enhanced chat.
-    
-    Args:
-        doc_ids: List of document IDs to extract context from
-        
-    Returns:
-        Formatted context string with document contents
     """
     if not doc_ids:
         return ""
@@ -86,13 +75,6 @@ def get_document_context(doc_ids: List[str]) -> str:
 def search_relevant_documents(query: str, top_k: int = RAG_TOP_K) -> tuple[str, List[str]]:
     """
     Search for relevant documents using semantic search for RAG.
-    
-    Args:
-        query: User's query to search for
-        top_k: Number of top documents to retrieve
-        
-    Returns:
-        Tuple of (context_string, list_of_doc_ids)
     """
     try:
         from app.services.semantic_service import semantic_search
@@ -166,18 +148,6 @@ def chat_completion(
 ) -> str | Generator[str, None, None]:
     """
     Generate a chat completion using Ollama.
-    
-    Args:
-        message: User's message
-        history: Conversation history [{"role": "user"|"assistant", "content": "..."}]
-        document_ids: Optional list of document IDs for context (RAG)
-        model: Model name to use (default: llama3.2:3b)
-        system_prompt: Custom system prompt
-        stream: Whether to stream the response
-        use_rag: Whether to use automatic RAG (search relevant documents)
-        
-    Returns:
-        The assistant's response (string or generator if streaming)
     """
     if not OLLAMA_AVAILABLE:
         raise RuntimeError("Ollama is not available. Install with: pip install ollama")

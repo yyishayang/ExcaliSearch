@@ -1,7 +1,3 @@
-"""
-Search engine facade supporting normal (Whoosh) and semantic modes.
-"""
-
 from whoosh.highlight import ContextFragmenter, UppercaseFormatter
 from whoosh.qparser import MultifieldParser, OrGroup
 
@@ -80,11 +76,6 @@ def hybrid_search(query: str, limit: int = 20, use_reranking: bool = False) -> l
     """
     Búsqueda híbrida que combina resultados semánticos + keywords.
     Fusiona ambos con pesos para mejorar recall y precisión.
-    
-    Args:
-        query: Consulta de búsqueda
-        limit: Número máximo de resultados
-        use_reranking: Si activar reranking en la parte semántica (más lento pero más preciso)
     """
     # Obtener resultados de ambos métodos
     try:

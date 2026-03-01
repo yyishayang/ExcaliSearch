@@ -5,10 +5,6 @@ import unicodedata
 def clean_text(raw: str) -> str:
     """
     Clean and normalize extracted text:
-    - Normalize unicode
-    - Remove control characters (keep newlines and tabs)
-    - Collapse multiple whitespace
-    - Strip leading/trailing whitespace
     """
     # Normalize unicode to NFC form
     text = unicodedata.normalize("NFC", raw)

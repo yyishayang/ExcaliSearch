@@ -27,8 +27,6 @@ from app.services.semantic_service import (
 )
 from app.services.summary_service import generate_preview, generate_smart_summary
 
-
-# In-memory text cache: doc_id -> full text
 _text_cache: dict[str, str] = {}
 
 
@@ -119,10 +117,6 @@ def get_document_text(doc_id: str) -> str | None:
 def remove_document(doc_id: str) -> bool:
     """
     Remove a document completely:
-    - Delete from index
-    - Delete file from storage
-    - Delete from database
-    - Remove from text cache
     """
     doc = get_document(doc_id)
     if doc is None:

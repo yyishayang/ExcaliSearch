@@ -105,17 +105,6 @@ def generate_smart_summary(
 ) -> str:
     """
     Generate a summary with automatic language detection and fallback.
-    
-    Args:
-        text: The text to summarize
-        max_sentences: Number of sentences in the summary
-        method: Summarization method:
-            - "auto": Use LLM if available and enabled, otherwise extractive
-            - "extractive": Always use sumy (fast, works offline)
-            - "llm": Always use LLM (better quality, requires Ollama)
-    
-    Returns:
-        Generated summary string, or preview as fallback
     """
     if not text or len(text.strip()) < 100:
         # Too short, just return preview
