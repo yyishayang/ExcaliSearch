@@ -81,11 +81,6 @@ def _extract_pdf(file_path: Path) -> tuple[str, int]:
 
 def _ocr_embedded_images(doc, page) -> str:
     """Extract images embedded in a PDF page and return their OCR text.
-
-    Uses PyMuPDF to pull the raw image bytes, Pillow to decode them, and
-    pytesseract to recognise the text.  No Poppler or page-rasterisation
-    is involved — only the images that are literally embedded in the PDF.
-    Returns an empty string if no images are found or on any failure.
     """
     try:
         import pytesseract

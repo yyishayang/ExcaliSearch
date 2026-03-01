@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import PropTypes from 'prop-types'
 import { HiPaperAirplane, HiX, HiRefresh, HiLightBulb, HiDocumentText } from 'react-icons/hi'
-import { FaRobot, FaUser } from 'react-icons/fa'
+import { FaCrown, FaUser } from 'react-icons/fa'
 
 const API_BASE = '/api'
 
@@ -35,7 +35,7 @@ export default function ChatPanel({ onClose, documentContext = null }) {
             if (res.ok) {
                 const data = await res.json()
                 setChatAvailable(data.available)
-                
+
                 if (data.available && messages.length === 0) {
                     setMessages([{
                         role: 'assistant',
@@ -51,12 +51,12 @@ export default function ChatPanel({ onClose, documentContext = null }) {
 
     const sendMessage = async (e) => {
         e?.preventDefault()
-        
+
         if (!input.trim() || loading) return
 
         const userMessage = input.trim()
         setInput('')
-        
+
         // Add user message immediately
         const newMessages = [...messages, { role: 'user', content: userMessage }]
         setMessages(newMessages)
@@ -84,22 +84,22 @@ export default function ChatPanel({ onClose, documentContext = null }) {
 
             if (res.ok) {
                 const data = await res.json()
-                setMessages([...newMessages, { 
-                    role: 'assistant', 
-                    content: data.response 
+                setMessages([...newMessages, {
+                    role: 'assistant',
+                    content: data.response
                 }])
             } else {
                 const error = await res.json()
-                setMessages([...newMessages, { 
-                    role: 'assistant', 
-                    content: `Error: ${error.detail || 'Could not get response'}` 
+                setMessages([...newMessages, {
+                    role: 'assistant',
+                    content: `Error: ${error.detail || 'Could not get response'}`
                 }])
             }
         } catch (error) {
             console.error('Error sending message:', error)
-            setMessages([...newMessages, { 
-                role: 'assistant', 
-                content: 'Connection error. Please verify that Ollama is running.' 
+            setMessages([...newMessages, {
+                role: 'assistant',
+                content: 'Connection error. Please verify that Ollama is running.'
             }])
         } finally {
             setLoading(false)
@@ -109,7 +109,7 @@ export default function ChatPanel({ onClose, documentContext = null }) {
     const clearChat = () => {
         setMessages([{
             role: 'assistant',
-            content: documentContext 
+            content: documentContext
                 ? `Chat restarted. What else would you like to know about "${documentContext.name}"?`
                 : 'Chat restarted. How can I help you?'
         }])
@@ -127,7 +127,7 @@ export default function ChatPanel({ onClose, documentContext = null }) {
             <div className="chat-panel">
                 <div className="chat-panel__header">
                     <h3 className="flex items-center gap-2">
-                        <FaRobot /> AI Chat
+                        <FaCrown /> Arthur
                     </h3>
                     <button className="btn btn--ghost btn--sm" onClick={onClose}>
                         <HiX />
@@ -147,7 +147,7 @@ export default function ChatPanel({ onClose, documentContext = null }) {
             <div className="chat-panel">
                 <div className="chat-panel__header">
                     <h3 className="flex items-center gap-2">
-                        <FaRobot /> AI Chat
+                        <FaCrown /> Arthur
                     </h3>
                     <button className="btn btn--ghost btn--sm" onClick={onClose}>
                         <HiX />
@@ -175,7 +175,7 @@ export default function ChatPanel({ onClose, documentContext = null }) {
             <div className="chat-panel__header">
                 <div>
                     <h3 className="flex items-center gap-2">
-                        <FaRobot /> AI Chat
+                        <FaCrown /> Arthur
                     </h3>
                     {documentContext ? (
                         <p className="text-xs opacity-70 flex items-center gap-1 mt-1">
@@ -207,12 +207,12 @@ export default function ChatPanel({ onClose, documentContext = null }) {
 
             <div className="chat-panel__messages">
                 {messages.map((msg, idx) => (
-                    <div 
-                        key={idx} 
+                    <div
+                        key={idx}
                         className={`chat-message chat-message--${msg.role}`}
                     >
                         <div className="chat-message__avatar">
-                            {msg.role === 'user' ? <FaUser /> : <FaRobot />}
+                            {msg.role === 'user' ? <FaUser /> : <FaCrown />}
                         </div>
                         <div className="chat-message__content">
                             {msg.content}
@@ -222,7 +222,7 @@ export default function ChatPanel({ onClose, documentContext = null }) {
                 {loading && (
                     <div className="chat-message chat-message--assistant">
                         <div className="chat-message__avatar">
-                            <FaRobot />
+                            <FaCrown />
                         </div>
                         <div className="chat-message__content">
                             <div className="chat-typing">
@@ -247,8 +247,8 @@ export default function ChatPanel({ onClose, documentContext = null }) {
                     disabled={loading}
                     className="chat-input"
                 />
-                <button 
-                    type="submit" 
+                <button
+                    type="submit"
                     disabled={!input.trim() || loading}
                     className="btn btn--primary"
                 >

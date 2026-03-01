@@ -268,11 +268,19 @@ export default function UploadPanel({ onUploadComplete, compact = false }) {
                 title={batchMode ? "Sube múltiples documentos" : "Sube un documento nuevo"}
             >
                 <div className="upload-zone__icon">
-                    {compact ? (
-                        <HiUpload size={24} className="mx-auto" />
-                    ) : (
-                        <HiCloudUpload size={48} className="mx-auto opacity-70" />
-                    )}
+                    <img
+                        src={
+                            message?.type === 'error' ? "/arturofail.webp" :
+                                message?.type === 'success' ? "/arturowin.webp" :
+                                    "/arturoIdle.webp"
+                        }
+                        alt={
+                            message?.type === 'error' ? "Arturo Error" :
+                                message?.type === 'success' ? "Arturo Success" :
+                                    "Arturo"
+                        }
+                        className={compact ? "upload-zone__arturo--compact" : "upload-zone__arturo"}
+                    />
                 </div>
                 {!compact && (
                     <>

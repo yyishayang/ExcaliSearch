@@ -289,12 +289,6 @@ def semantic_search(
     """
     Busca los chunks más similares semánticamente a la consulta.
     Devuelve los mejores resultados (1 por cada documento como máximo).
-    
-    Args:
-        query: Consulta de búsqueda
-        limit: Número máximo de resultados
-        use_reranking: Aplicar reranking con Cross-Encoder (mejora precisión)
-        file_type_filter: Filtrar por tipo de archivo (pdf, txt, csv, etc.)
     """
     if not query.strip():
         return []

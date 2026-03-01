@@ -4,14 +4,6 @@ import { BiTargetLock } from 'react-icons/bi'
 
 const API_BASE = '/api'
 
-/**
- * Converts Whoosh UPPERCASE highlights into <mark> elements.
- * Whoosh UppercaseFormatter wraps matches in UPPERCASE.
- * We detect sequences of uppercase words surrounded by lowercase text.
- *
- * Since Whoosh returns highlights with UPPERCASED matched terms,
- * we parse the snippet to find them and wrap them in <mark> tags.
- */
 function formatSnippet(snippet, query) {
     if (!snippet || !query) return snippet || ''
 
