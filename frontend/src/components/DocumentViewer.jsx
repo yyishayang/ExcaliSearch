@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { renderAsync } from 'docx-preview'
 import * as XLSX from 'xlsx'
 import Spreadsheet from "react-spreadsheet";
-import { HiDatabase, HiPencilAlt, HiDocumentText, HiClock, HiDownload, HiX, HiTable } from 'react-icons/hi'
+import { HiDatabase, HiPencilAlt, HiDocumentText, HiClock, HiDownload, HiX, HiTable, HiLightBulb, HiRefresh, HiChip, HiBeaker, HiLightningBolt } from 'react-icons/hi'
 
 const API_BASE = '/api'
 
@@ -48,6 +48,12 @@ export default function DocumentViewer({ docId, query, onClose }) {
     const [error, setError] = useState(null)
     const [spreadsheetData, setSpreadsheetData] = useState(null) // { sheetNames: [], sheets: { name: [[cell]] } }
     const [activeSheet, setActiveSheet] = useState(0)
+    const [regeneratingSummary, setRegeneratingSummary] = useState(false)
+    const [showSummary, setShowSummary] = useState(true)
+    const [showSummaryOptions, setShowSummaryOptions] = useState(false)
+    const [summaryMethod, setSummaryMethod] = useState('auto')
+    const [summaryAlgorithm, setSummaryAlgorithm] = useState('lsa')
+    const [sentenceCount, setSentenceCount] = useState(5)
     const docxContainerRef = useRef(null)
 
     // Fetch document metadata (and render DOCX if applicable)
@@ -195,6 +201,167 @@ export default function DocumentViewer({ docId, query, onClose }) {
                         </button>
                     </div>
                 </div>
+
+                {/* Summary Section */}
+                {doc && doc.summary && showSummary && (
+                    <div className="viewer__summary">
+                        <div className="viewer__summary-header">
+                            <div className="flex items-center gap-2">
+                                <HiLightBulb className="text-yellow-500" size={22} />
+                                <h3 className="text-lg font-semibold" style={{ marginBottom: 0 }}>Resumen automático</h3>
+                                {/* Method badge - will show after regeneration with new API */}
+                                {summaryMethod && (
+                                    <span className={`summary-badge summary-badge--${summaryMethod}`} title={`Método: ${summaryMethod}`}>
+                                        {summaryMethod === 'llm' && <HiChip size={12} />}
+                                        {summaryMethod === 'extractive' && <HiLightningBolt size={12} />}
+                                        {summaryMethod === 'auto' && <HiBeaker size={12} />}
+                                        {summaryMethod}
+                                    </span>
+                                )}
+                            </div>
+                            <div className="flex gap-2">
+                                <button
+                                    className="btn btn--secondary btn--sm"
+                                    onClick={() => setShowSummaryOptions(!showSummaryOptions)}
+                                    disabled={regeneratingSummary}
+                                    title="Opciones de resumen"
+                                >
+                                    <HiRefresh className={regeneratingSummary ? 'animate-spin' : ''} />
+                                </button>
+                                <button
+                                    className="btn btn--secondary btn--sm"
+                                    onClick={() => setShowSummary(false)}
+                                    title="Cerrar resumen"
+                                >
+                                    <HiX />
+                                </button>
+                            </div>
+                        </div>
+                        
+                        {/* Summary options panel */}
+                        {showSummaryOptions && (
+                            <div className="viewer__summary-options">
+                                <div className="summary-info-box">
+                                    <span className="summary-info-icon">💡</span>
+                                    <div className="summary-info-text">
+                                        <strong>Auto:</strong> Usa LLM si está disponible, sino extractivo<br/>
+                                        <strong>Rápido:</strong> Extrae frases del documento (~1s)<br/>
+                                        <strong>LLM:</strong> Reformula el contenido (mejor calidad, ~10-30s)
+                                    </div>
+                                </div>
+                                
+                                <div className="summary-option-group">
+                                    <label className="summary-option-label">
+                                        Método:
+                                    </label>
+                                    <div className="summary-method-buttons">
+                                        <button
+                                            className={`method-btn ${summaryMethod === 'auto' ? 'active' : ''}`}
+                                            onClick={() => setSummaryMethod('auto')}
+                                            title="Usa LLM si está disponible, sino extractivo"
+                                        >
+                                            <HiBeaker size={16} /> Auto
+                                        </button>
+                                        <button
+                                            className={`method-btn ${summaryMethod === 'extractive' ? 'active' : ''}`}
+                                            onClick={() => setSummaryMethod('extractive')}
+                                            title="Rápido, extrae frases del documento"
+                                        >
+                                            <HiLightningBolt size={16} /> Rápido
+                                        </button>
+                                        <button
+                                            className={`method-btn ${summaryMethod === 'llm' ? 'active' : ''}`}
+                                            onClick={() => setSummaryMethod('llm')}
+                                            title="Mejor calidad, requiere Ollama"
+                                        >
+                                            <HiChip size={16} /> LLM
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                {summaryMethod === 'extractive' && (
+                                    <div className="summary-option-group">
+                                        <label className="summary-option-label">
+                                            Algoritmo:
+                                        </label>
+                                        <select
+                                            value={summaryAlgorithm}
+                                            onChange={(e) => setSummaryAlgorithm(e.target.value)}
+                                            className="summary-select"
+                                        >
+                                            <option value="lsa">LSA (rápido)</option>
+                                            <option value="lexrank">LexRank (preciso)</option>
+                                            <option value="textrank">TextRank (balanceado)</option>
+                                        </select>
+                                    </div>
+                                )}
+                                
+                                <div className="summary-option-group">
+                                    <label className="summary-option-label">
+                                        Frases: {sentenceCount}
+                                    </label>
+                                    <input
+                                        type="range"
+                                        min="2"
+                                        max="10"
+                                        value={sentenceCount}
+                                        onChange={(e) => setSentenceCount(Number(e.target.value))}
+                                        className="summary-slider"
+                                    />
+                                </div>
+                                
+                                <button
+                                    className="btn btn--primary btn--sm w-full"
+                                    onClick={async () => {
+                                        setShowSummaryOptions(false)
+                                        setRegeneratingSummary(true)
+                                        try {
+                                            const res = await fetch(`${API_BASE}/summary/${docId}/regenerate`, {
+                                                method: 'POST',
+                                                headers: { 'Content-Type': 'application/json' },
+                                                body: JSON.stringify({
+                                                    method: summaryMethod,
+                                                    sentence_count: sentenceCount,
+                                                    algorithm: summaryAlgorithm,
+                                                    language: 'spanish'
+                                                })
+                                            })
+                                            if (res.ok) {
+                                                const data = await res.json()
+                                                setDoc(prev => ({ ...prev, summary: data.summary }))
+                                                // Update the method indicator based on what was actually used
+                                                if (data.method) {
+                                                    setSummaryMethod(data.method)
+                                                }
+                                            } else {
+                                                const error = await res.json()
+                                                alert(`Error: ${error.detail || 'Failed to regenerate summary'}`)
+                                            }
+                                        } catch (err) {
+                                            console.error('Failed to regenerate summary:', err)
+                                            alert('Error: No se pudo regenerar el resumen')
+                                        } finally {
+                                            setRegeneratingSummary(false)
+                                        }
+                                    }}
+                                    disabled={regeneratingSummary}
+                                >
+                                    {regeneratingSummary ? (
+                                        <span className="flex items-center gap-2 justify-center">
+                                            <HiRefresh className="animate-spin" /> Generando...
+                                        </span>
+                                    ) : (
+                                        'Regenerar resumen'
+                                    )}
+                                </button>
+                            </div>
+                        )}
+                        
+                        <div className="viewer__summary-text">
+                            {doc.summary}
+                        </div>
+                    </div>
+                )}
 
                 <div className={`viewer__content ${doc?.file_type === 'pdf' ? 'viewer__content--pdf' : ''}`}>
                     {loading && (

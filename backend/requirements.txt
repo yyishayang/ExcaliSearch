@@ -11,3 +11,8 @@ Pillow
 chromadb
 sentence-transformers
 openpyxl
+# Automatic summarization
+sumy
+nltk
+# LLM-based summarization (optional, requires Ollama running)
+ollama
