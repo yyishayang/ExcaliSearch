@@ -63,6 +63,7 @@
   height: 80px;
   object-fit: contain;
   filter: drop-shadow(0 0 8px var(--color-accent-glow));
+  transform: rotate(45deg);
 }
 
 .top-banner__search {
@@ -221,15 +222,31 @@
 }
 
 .upload-zone__icon {
-  font-size: 2.5rem;
   margin-bottom: var(--space-sm);
-  opacity: 0.7;
   transition: transform var(--transition-base);
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
-.upload-zone:hover .upload-zone__icon {
-  transform: translateY(-4px);
+.upload-zone__arturo {
+  width: 120px;
+  height: 120px;
+  object-fit: contain;
+  opacity: 0.8;
+  transition: all var(--transition-base);
+}
+
+.upload-zone__arturo--compact {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+}
+
+.upload-zone:hover .upload-zone__arturo {
+  transform: translateY(-4px) scale(1.05);
   opacity: 1;
+  filter: drop-shadow(0 0 15px var(--color-accent-glow));
 }
 
 .upload-zone__text {
